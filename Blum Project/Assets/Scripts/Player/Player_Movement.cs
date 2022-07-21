@@ -134,7 +134,7 @@ public class Player_Movement : MonoBehaviour
         if (data.input.jumpPressed && _isPerformingJump) _Jump_Perform();
         if (data.rb.velocity.y < 0 && !grounded && _jumpReachedEnd) 
         { 
-            data.PlayAnimation(Player_References.animations.jump, 0dw); 
+            data.PlayAnimation(Player_References.animations.jump, 0); 
         }
     }
     private void _Movement_horizontal()
