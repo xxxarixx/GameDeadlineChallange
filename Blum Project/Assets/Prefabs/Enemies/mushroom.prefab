@@ -9,7 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 524614683973387628}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: enm_groundedPivolt
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -24,7 +24,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 524614683973387629}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.194, y: 0.143, z: 0}
+  m_LocalPosition: {x: 0.131, y: 0.143, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 524614684156525054}
@@ -39,7 +39,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 524614684156525054}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: enm_BottomPivolt
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -73,7 +73,7 @@ GameObject:
   - component: {fileID: 524614684482490998}
   - component: {fileID: 524614684482490997}
   - component: {fileID: 524614684482490987}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: enm_Sprend
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -178,7 +178,7 @@ GameObject:
   - component: {fileID: 524614685250456604}
   - component: {fileID: 524614685250456606}
   - component: {fileID: 524614685250456595}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: mushroom
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -214,6 +214,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   data: {fileID: 524614685250456604}
   maxHealth: 15
+  knockMultiplayer: 1
 --- !u!114 &524614685250456607
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -228,7 +229,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   data: {fileID: 524614685250456604}
   enemyType: 0
-  damagePerHit: 1
+  damagePerHit: 2
+  inAirSpeedMultiplayer: 0.7
   maxSpeed: 100
   groundMask:
     serializedVersion: 2

@@ -14,40 +14,50 @@ public class Enm_Behaviour : MonoBehaviour
     [Header("allType")]
     [SerializeField] private int damagePerHit;
     public float currentSpeed { get; private set; }
+    public float inAirSpeedMultiplayer = .7f;
+    private float speedInAir;
+    private float speedGrounded;
     [SerializeField] private float maxSpeed;
     [SerializeField] private LayerMask groundMask;
     [Header("patrolWRadialChase")]
     [SerializeField]private float radialRadious;
     [SerializeField] private Vector3 hitBoxSize;
-    private Vector3 _moveDir;
+    private float _moveDirX = 1f;
+    private bool stopMove;
     void Start()
     {
-        currentSpeed = maxSpeed;
-        _moveDir = new Vector3(1f, 0f, 0f);
+        speedGrounded = maxSpeed + Random.Range(-currentSpeed / 10, currentSpeed / 10);
+        currentSpeed = speedGrounded;
+        speedInAir = currentSpeed * inAirSpeedMultiplayer;
+        _moveDirX = 1f;
     }
     private bool _grounded;
-    void Update()
-    {
-        _grounded = Physics2D.Raycast(data.grounded_Pivolt.position, Vector3.down,0.5f, groundMask);
-        if (!_grounded || Physics2D.Raycast(data.grounded_Pivolt.position,Vector2.right * Mathf.Clamp(data.rb.velocity.x, -1,1), 0.5f, groundMask))
-        {
-            _moveDir.x = -_moveDir.x;
-            data.rb.velocity = Vector3.zero;
-            data.flip_Pivolt.localScale = new Vector3(-data.flip_Pivolt.localScale.x, data.flip_Pivolt.localScale.y, data.flip_Pivolt.localScale.z);
-        } 
-    }
-
+    private bool _groundedPatrolDireciton;
     private void FixedUpdate()
     {
+        if(stopMove) return;
+        _groundedPatrolDireciton = Physics2D.Raycast(data.grounded_Pivolt.position, Vector3.down,0.5f, groundMask);
+        _grounded = Physics2D.Raycast(data.flip_Pivolt.position, Vector3.down, 0.3f, groundMask);
+        if (!_groundedPatrolDireciton && _grounded || Physics2D.Raycast(data.grounded_Pivolt.position, data.flip_Pivolt.right * Mathf.Clamp(data.rb.velocity.x, -1,1), 0.5f, groundMask) && _grounded)
+        {
+            _moveDirX = -_moveDirX;
+            data.flip_Pivolt.localScale = new Vector3(-data.flip_Pivolt.localScale.x, data.flip_Pivolt.localScale.y, data.flip_Pivolt.localScale.z);
+        } 
+        data.rb.velocity = new Vector2(_moveDirX,0f) * currentSpeed * Time.fixedDeltaTime + new Vector2(0f, data.rb.velocity.y);
         if (_grounded)
         {
-            data.rb.velocity = _moveDir * currentSpeed * Time.fixedDeltaTime;
             data.PlayAnimation(Enm_References.animations.walk, 0);
+            currentSpeed = speedGrounded;
+        }
+        else
+        {
+            currentSpeed = speedInAir;
         }
     }
-    public void Move()
+    public void SetForceStopMovement(bool stopMove)
     {
-
+        this.stopMove = stopMove;
+        data.rb.velocity = Vector3.zero;
     }
     private void OnDrawGizmos()
     {
@@ -56,12 +66,12 @@ public class Enm_Behaviour : MonoBehaviour
             case EnemyType.PatrolJust:
                 Gizmos.color = Color.green;
                 Gizmos.DrawLine(data.grounded_Pivolt.position, data.grounded_Pivolt.position + Vector3.down * 0.5f);
-                Gizmos.DrawLine(data.grounded_Pivolt.position, data.grounded_Pivolt.position + Vector3.right * Mathf.Clamp(data.rb.velocity.x, -1, 1) * 0.5f);
+                Gizmos.DrawLine(data.grounded_Pivolt.position, data.grounded_Pivolt.position + data.flip_Pivolt.right * Mathf.Clamp(data.rb.velocity.x, -1, 1) * 0.5f);
                 break;
             case EnemyType.PatrolWRadialChase:
                 Gizmos.color = Color.green;
                 Gizmos.DrawLine(data.flip_Pivolt.position, data.flip_Pivolt.position + Vector3.down * 0.5f);
-                Gizmos.DrawLine(data.grounded_Pivolt.position, data.grounded_Pivolt.position + Vector3.right * Mathf.Clamp(data.rb.velocity.x, -1, 1) * 0.5f);
+                Gizmos.DrawLine(data.grounded_Pivolt.position, data.grounded_Pivolt.position + data.flip_Pivolt.right * Mathf.Clamp(data.rb.velocity.x, -1, 1) * 0.5f);
                 Gizmos.color = Color.red;
                 Gizmos.DrawWireSphere(data.flip_Pivolt.position,radialRadious);
                 break;
@@ -98,7 +108,6 @@ public class Enm_Behaviour_Editor : Editor
 
 
         //save changes
-        EditorUtility.SetDirty(_Behaviour);
         serializedObject.ApplyModifiedProperties();
     }
     private void _DrawProperty(string _propertyName)
@@ -112,6 +121,7 @@ public class Enm_Behaviour_Editor : Editor
         _DrawProperty("enemyType");
         _DrawProperty("damagePerHit");
         _DrawProperty("maxSpeed");
+        _DrawProperty("inAirSpeedMultiplayer");
         _DrawProperty("groundMask");
     }
 }

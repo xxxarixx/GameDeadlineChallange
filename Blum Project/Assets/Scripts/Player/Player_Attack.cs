@@ -35,7 +35,7 @@ public class Player_Attack : MonoBehaviour
             {
                 if(hit.TryGetComponent(out IDamagableByPlayer damagable))
                 {
-                    damagable.OnHit(weapon.hitDamage, transform.GetInstanceID());
+                    damagable.OnHit(weapon.hitDamage, transform.GetInstanceID(), data.attack_Pivolt.position, weapon.knockForce);
                     _objectsHitted.Add(damagable);
                 }
             }
@@ -63,7 +63,7 @@ public class Player_Attack : MonoBehaviour
     }
     public void AnimationEnded()
     {
-        _attackTime = weapon.attackSpeed;
+        _attackTime = 1f / weapon.attackSpeed;
         _isAttacking = false;
         data.ResetAnimationPriority();
         data.movement.SetMoveState(true);

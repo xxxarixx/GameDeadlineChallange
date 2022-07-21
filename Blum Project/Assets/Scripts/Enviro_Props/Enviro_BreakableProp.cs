@@ -11,7 +11,7 @@ public class Enviro_BreakableProp : MonoBehaviour,IDamagableByPlayer
     {
         currentHealth = maxHealth;
     }
-    public void OnHit(int _damage, int _hitID)
+    public void OnHit(int _damage, int _hitID, Vector3 _hitInvokerPosition, float _weaponKnockForce)
     {
         //detection one damage per swing
         if (this.hitID == _hitID) return;
