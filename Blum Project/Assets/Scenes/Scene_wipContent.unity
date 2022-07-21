@@ -5382,7 +5382,7 @@ MonoBehaviour:
   m_RefResolutionX: 320
   m_RefResolutionY: 180
   m_UpscaleRT: 0
-  m_PixelSnapping: 1
+  m_PixelSnapping: 0
   m_CropFrameX: 0
   m_CropFrameY: 0
   m_StretchFill: 0
@@ -7138,6 +7138,18 @@ PrefabInstance:
     - target: {fileID: 524614685250456605, guid: 29116b0959bdaf14493d09df8796a006, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 524614685250456606, guid: 29116b0959bdaf14493d09df8796a006, type: 3}
+      propertyPath: m_Interpolate
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 524614685250456607, guid: 29116b0959bdaf14493d09df8796a006, type: 3}
+      propertyPath: enemyType
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 524614685250456607, guid: 29116b0959bdaf14493d09df8796a006, type: 3}
+      propertyPath: chaseRadius
+      value: 2
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 29116b0959bdaf14493d09df8796a006, type: 3}
