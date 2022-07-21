@@ -8,6 +8,7 @@ public class Player_Input : MonoBehaviour
     public delegate void Del_none();
     public event Del_none OnJumpJustPressed;
     public event Del_none OnJumpCancelled;
+    public event Del_none OnAttack;
     public bool jumpPressed { get; private set; }
     public Vector2 moveInput { get; private set; }
     private void Awake()
@@ -18,8 +19,9 @@ public class Player_Input : MonoBehaviour
     private void MoveInput_canceled(InputAction.CallbackContext ctx) => moveInput = Vector2.zero;
     private void Jump_canceled(InputAction.CallbackContext ctx) { OnJumpCancelled?.Invoke(); jumpPressed = false; }
     private void Jump_started(InputAction.CallbackContext ctx) { OnJumpJustPressed?.Invoke(); jumpPressed = true; }
+    private void Attack_performed(InputAction.CallbackContext ctx) => OnAttack?.Invoke();
 
-   
+
     //subscribe all input events and enable all inputs
     private void OnEnable()
     {
@@ -27,8 +29,10 @@ public class Player_Input : MonoBehaviour
         _inputSystem.Player.MoveInput.canceled += MoveInput_canceled;
         _inputSystem.Player.Jump.canceled += Jump_canceled;
         _inputSystem.Player.Jump.performed += Jump_started;
+        _inputSystem.Player.Attack.performed += Attack_performed;
         _inputSystem.Enable();
     }
+
 
 
     //unsubscribe all input events and disable all inputs
@@ -38,6 +42,7 @@ public class Player_Input : MonoBehaviour
         _inputSystem.Player.MoveInput.canceled -= MoveInput_canceled;
         _inputSystem.Player.Jump.canceled -= Jump_canceled;
         _inputSystem.Player.Jump.performed -= Jump_started;
+        _inputSystem.Player.Attack.performed -= Attack_performed;
         _inputSystem.Disable();
     }
 }

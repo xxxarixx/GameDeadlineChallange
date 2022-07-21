@@ -10,6 +10,7 @@ public class Player_Movement : MonoBehaviour
     [SerializeField] private float speedOnGround = 500f;
     [SerializeField] private float speedInAir = 250f;
     private Vector2 _lastVelocityBeforeStop;
+    private bool _canMove = true;
     private enum _MoveAxis
     {
         Horizontal,
@@ -21,6 +22,8 @@ public class Player_Movement : MonoBehaviour
     public float justpressJumpVelocity = 5f;
     public AnimationCurve jumpVelocity;
     private bool _jumpReachedEnd = false;
+    private bool _coyoteTimeUsed = false;
+    private bool _coyoteTimeEnded = false;
 
     [Header("Grounded")]
     [SerializeField] private float grounded_DistancePlayerGround;
@@ -36,7 +39,7 @@ public class Player_Movement : MonoBehaviour
     private void FixedUpdate()
     {
         _FixedUpdate_Debug();
-        grounded = Physics2D.Raycast(data.flip_Pivolt.position, Vector2.down, grounded_DistancePlayerGround, groundLayerMask);
+        _GroundedAndCoyoteTime();
         _Movement_horizontal();
         _Jump_Action();
     }
@@ -61,12 +64,38 @@ public class Player_Movement : MonoBehaviour
 
 
     #region Private Functions
+    private IEnumerator _CoyoteTimeCountDown()
+    {
+        _coyoteTimeUsed = true;
+        grounded = true;
+        yield return new WaitForSeconds(.15f);
+        _coyoteTimeEnded = true;
+    }
+    private void _GroundedAndCoyoteTime()
+    {
+        var localGrounded = Physics2D.Raycast(data.flip_Pivolt.position, Vector2.down, grounded_DistancePlayerGround, groundLayerMask);
+        if (_coyoteTimeUsed && _coyoteTimeEnded || localGrounded)
+        {
+            grounded = localGrounded;
+            if (grounded)
+            {
+                _coyoteTimeUsed = false;
+                _coyoteTimeEnded = false;
+                StopCoroutine(_CoyoteTimeCountDown());
+            }
+        }
+        if (!localGrounded && !_coyoteTimeUsed)
+        {
+            StartCoroutine(_CoyoteTimeCountDown());
+        }
+    }
     private void _Input_OnJumpJustPressed()
     {
+        if (!_canMove) return;
         _isPerformingJump = (grounded) ? true : false;
         if (_isPerformingJump)
         {
-            data.PlayAnimation(Player_References.animations.jump);
+            data.PlayAnimation(Player_References.animations.jump,0);
         }
     }
     private void _Input_OnJumpCancelled()
@@ -94,7 +123,6 @@ public class Player_Movement : MonoBehaviour
         //reset player velocity Y if player doesnt reached end jump curve velocity and pressed up jump key
         if (!_jumpReachedEnd)
         {
-            Debug.Log("AppliedReachedEndVelocity");
             data.rb.velocity = new Vector2(data.rb.velocity.x, justpressJumpVelocity);
             _jumpReachedEnd = true;
         }
@@ -104,10 +132,14 @@ public class Player_Movement : MonoBehaviour
     private void _Jump_Action()
     {
         if (data.input.jumpPressed && _isPerformingJump) _Jump_Perform();
-        if (data.rb.velocity.y < 0 && !grounded && _jumpReachedEnd) data.PlayAnimation(Player_References.animations.falling);
+        if (data.rb.velocity.y < 0 && !grounded && _jumpReachedEnd) 
+        { 
+            data.PlayAnimation(Player_References.animations.falling, 0); 
+        }
     }
     private void _Movement_horizontal()
     {
+        if (!_canMove) return;
         _Move(speed_current, _MoveAxis.Horizontal);
         _FlipBasedOnVelocity();
         _lastVelocityBeforeStop = (data.rb.velocity != Vector2.zero) ? data.rb.velocity : _lastVelocityBeforeStop;
@@ -115,11 +147,11 @@ public class Player_Movement : MonoBehaviour
         {
             if(Mathf.Abs(data.rb.velocity.x) > 0f)
             {
-                data.PlayAnimation(Player_References.animations.walk);
+                data.PlayAnimation(Player_References.animations.walk,0);
             }
             else
             {
-                data.PlayAnimation(Player_References.animations.idle);
+                data.PlayAnimation(Player_References.animations.idle,0);
             }
         }
 
@@ -156,6 +188,18 @@ public class Player_Movement : MonoBehaviour
     #endregion
 
     #region Public Functions
-
+    public void SetMoveState(bool _canMove)
+    {
+        if (!_canMove) data.rb.velocity = Vector2.zero;
+        this._canMove = _canMove;
+    }
+    public void StopPlayerMove()
+    {
+        data.rb.velocity = Vector2.zero;
+    }
+    public void StopPlayerMove(Vector2 offsetVelocity)
+    {
+        data.rb.velocity = Vector2.zero + offsetVelocity;
+    }
     #endregion
 }

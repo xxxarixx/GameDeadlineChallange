@@ -7,11 +7,18 @@ public class Player_References : MonoBehaviour
     public static Player_References instance { get; private set; }
     public Player_Input input;
     public Player_Movement movement;
+    public Player_Attack attack;
     public Rigidbody2D rb;
     public CircleCollider2D collision;
     public Transform flip_Pivolt;
+    public Transform attack_Pivolt;
     public Animator anim;
-    #region animations
+    private int _currentAnimationPriority = -1;
+    private void Awake()
+    {
+        _currentAnimationPriority = -1;
+    }
+    #region animation handling
     public enum animations
     {
         walk,
@@ -31,11 +38,24 @@ public class Player_References : MonoBehaviour
     private int _attackAnimationHash { get { return Animator.StringToHash(attackAnimation.name); } set { } }
     [SerializeField] private AnimationClip attackAnimation;
 
-    public void PlayAnimation(animations animationEnum)
+    public void PlayAnimation(animations animationEnum, int Priority)
     {
+        if (_currentAnimationPriority > Priority) return;
+        _currentAnimationPriority = Priority;
         var animationToPlay = _animations_EnumToAnimation(animationEnum);
         anim.Play(animationToPlay);
         
+    }
+    public void PlayAnimation(int animationHash, int Priority)
+    {
+        if (_currentAnimationPriority > Priority) return;
+        _currentAnimationPriority = Priority;
+        anim.Play(animationHash);
+
+    }
+    public void ResetAnimationPriority()
+    {
+        _currentAnimationPriority = -1;
     }
     private int _animations_EnumToAnimation(animations animationEnum)
     {
