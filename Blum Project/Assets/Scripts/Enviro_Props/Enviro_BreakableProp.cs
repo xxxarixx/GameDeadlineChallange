@@ -16,7 +16,7 @@ public class Enviro_BreakableProp : MonoBehaviour,IDamagableByPlayer
         //detection one damage per swing
         if (this.hitID == _hitID) return;
         this.hitID = _hitID;
-
+        Main_GameManager.instance.SpawnDamagePopup(transform.position, _damage);
         _currentHealth -= _damage;
         _DeadChecker();
     }

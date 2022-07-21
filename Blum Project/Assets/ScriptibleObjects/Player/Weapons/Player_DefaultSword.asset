@@ -14,5 +14,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   hitDamage: 3
   attackSpeed: 1
-  hitBoxSize: {x: 0.91, y: 0.61, z: 0}
-  otherCustomAnimation: {fileID: 0}
+  hitBoxSize: {x: 1.22, y: 0.61, z: 0}
+  otherCustomAnimation: {fileID: 7400000, guid: 52803e73cf051994ab2d37b39a4b6a2e, type: 2}

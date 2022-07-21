@@ -134,15 +134,15 @@ public class Player_Movement : MonoBehaviour
         if (data.input.jumpPressed && _isPerformingJump) _Jump_Perform();
         if (data.rb.velocity.y < 0 && !grounded && _jumpReachedEnd) 
         { 
-            data.PlayAnimation(Player_References.animations.falling, 0); 
+            data.PlayAnimation(Player_References.animations.jump, 0dw); 
         }
     }
     private void _Movement_horizontal()
     {
+        _lastVelocityBeforeStop = (data.input.moveInput != Vector2.zero) ? data.input.moveInput : _lastVelocityBeforeStop;
         if (!_canMove) return;
         _Move(speed_current, _MoveAxis.Horizontal);
         _FlipBasedOnVelocity();
-        _lastVelocityBeforeStop = (data.rb.velocity != Vector2.zero) ? data.rb.velocity : _lastVelocityBeforeStop;
         if (grounded && !_isPerformingJump)
         {
             if(Mathf.Abs(data.rb.velocity.x) > 0f)
