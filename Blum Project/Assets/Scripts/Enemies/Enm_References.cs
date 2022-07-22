@@ -11,6 +11,7 @@ public class Enm_References : MonoBehaviour
     public CircleCollider2D collision;
     public Transform flip_Pivolt;
     public Transform grounded_Pivolt;
+    public Transform attack_Pivolt;
     public Animator anim;
     private void Awake()
     {
@@ -31,28 +32,28 @@ public class Enm_References : MonoBehaviour
     private int _attackAnimationHash { get { return Animator.StringToHash(attackAnimation.name); } set { } }
     [SerializeField] private AnimationClip attackAnimation;
 
-    public void PlayAnimation(animations animationEnum, int Priority)
+    public void PlayAnimation(animations _animationEnum, int _priority)
     {
-        if (_currentAnimationPriority > Priority) return;
-        _currentAnimationPriority = Priority;
-        var animationToPlay = _animations_EnumToAnimation(animationEnum);
+        if (_currentAnimationPriority > _priority) return;
+        _currentAnimationPriority = _priority;
+        var animationToPlay = _animations_EnumToAnimation(_animationEnum);
         anim.Play(animationToPlay);
 
     }
-    public void PlayAnimation(int animationHash, int Priority)
+    public void PlayAnimation(int _animationHash, int _priority)
     {
-        if (_currentAnimationPriority > Priority) return;
-        _currentAnimationPriority = Priority;
-        anim.Play(animationHash);
+        if (_currentAnimationPriority > _priority) return;
+        _currentAnimationPriority = _priority;
+        anim.Play(_animationHash);
 
     }
     public void ResetAnimationPriority()
     {
         _currentAnimationPriority = -1;
     }
-    private int _animations_EnumToAnimation(animations animationEnum)
+    private int _animations_EnumToAnimation(animations _animationEnum)
     {
-        switch (animationEnum)
+        switch (_animationEnum)
         {
             case animations.walk:
                 return _walkAnimationHash;

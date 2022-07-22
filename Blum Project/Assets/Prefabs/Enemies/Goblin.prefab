@@ -59,6 +59,7 @@ Transform:
   m_Children:
   - {fileID: 524614684482490998}
   - {fileID: 524614683973387628}
+  - {fileID: 1767425809214505481}
   m_Father: {fileID: 524614685250456605}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -73,6 +74,7 @@ GameObject:
   - component: {fileID: 524614684482490998}
   - component: {fileID: 524614684482490997}
   - component: {fileID: 524614684482490987}
+  - component: {fileID: 7079426141027826294}
   m_Layer: 7
   m_Name: enm_Sprend
   m_TagString: Untagged
@@ -134,7 +136,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: -4387502403121105992, guid: 26709a380e71e6e47b5325d2418618cd, type: 3}
+  m_Sprite: {fileID: 21300000, guid: e84d0f762b091a0448c3d8e585a1df5a, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -155,7 +157,7 @@ Animator:
   m_GameObject: {fileID: 524614684482490999}
   m_Enabled: 1
   m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: bdcef2ef31d9919408ce37871e11feff, type: 2}
+  m_Controller: {fileID: 9100000, guid: 9685b76f40c4efd4aabd262dd9db32dd, type: 2}
   m_CullingMode: 0
   m_UpdateMode: 0
   m_ApplyRootMotion: 0
@@ -164,6 +166,33 @@ Animator:
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorControllerStateOnDisable: 0
+--- !u!114 &7079426141027826294
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 524614684482490999}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4785c73f2b2b74a498a6830183913aff, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  events:
+  - m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 524614685250456607}
+        m_TargetAssemblyTypeName: Enm_Behaviour, Assembly-CSharp
+        m_MethodName: AttackAnimationEnded
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!1 &524614685250456601
 GameObject:
   m_ObjectHideFlags: 0
@@ -179,7 +208,7 @@ GameObject:
   - component: {fileID: 524614685250456606}
   - component: {fileID: 524614685250456595}
   m_Layer: 7
-  m_Name: mushroom
+  m_Name: Goblin
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -213,7 +242,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   data: {fileID: 524614685250456604}
-  maxHealth: 15
+  maxHealth: 25
   knockMultiplayer: 1
 --- !u!114 &524614685250456607
 MonoBehaviour:
@@ -228,20 +257,20 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   data: {fileID: 524614685250456604}
-  enemyType: 0
-  damagePerHit: 2
+  enemyType: 1
+  damagePerHit: 1
   inAirSpeedMultiplayer: 0.7
   maxGroundSpeed: 100
-  maxChaseSpeed: 0
+  maxChaseSpeed: 200
   groundMask:
     serializedVersion: 2
     m_Bits: 64
-  chaseHitBox: {x: 0, y: 0, z: 0}
-  hitBoxSize: {x: 0, y: 0, z: 0}
-  attackSpeed: 0
+  chaseHitBox: {x: 3, y: 0.9, z: 0}
+  hitBoxSize: {x: 1.05, y: 0.51, z: 0}
+  attackSpeed: 0.9
   groundAndPlayerMask:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 320
 --- !u!114 &524614685250456604
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -260,11 +289,11 @@ MonoBehaviour:
   collision: {fileID: 524614685250456595}
   flip_Pivolt: {fileID: 524614684156525054}
   grounded_Pivolt: {fileID: 524614683973387628}
-  attack_Pivolt: {fileID: 0}
+  attack_Pivolt: {fileID: 1767425809214505481}
   anim: {fileID: 524614684482490987}
-  walkAnimation: {fileID: 7400000, guid: 3fe83edf1cf64ce47900ad2f27716849, type: 2}
-  idleAnimation: {fileID: 7400000, guid: 622220ad39ae5b54d9b0be1e246c48c8, type: 2}
-  attackAnimation: {fileID: 0}
+  walkAnimation: {fileID: 7400000, guid: f070b5b556cec444598c154204ae813c, type: 2}
+  idleAnimation: {fileID: 7400000, guid: 923e76170bad79d4ca5a6cf0229148cc, type: 2}
+  attackAnimation: {fileID: 7400000, guid: da1a0b1c2fb10944bafb15d1f461f842, type: 2}
 --- !u!50 &524614685250456606
 Rigidbody2D:
   serializedVersion: 4
@@ -302,3 +331,33 @@ CircleCollider2D:
   m_Offset: {x: 0.48815715, y: 0.21454036}
   serializedVersion: 2
   m_Radius: 0.25747597
+--- !u!1 &6775633596091456322
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1767425809214505481}
+  m_Layer: 7
+  m_Name: enm_AttackPivolt
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1767425809214505481
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6775633596091456322}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0.05, y: 0.204, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 524614684156525054}
+  m_RootOrder: 2
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}

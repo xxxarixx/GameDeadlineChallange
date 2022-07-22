@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
+using CustomEditorAssistance;
 [CreateAssetMenu(menuName ="Player/New Weapon", fileName = "new Weapon")]
 public class Player_Weapon : ScriptableObject
 {
@@ -22,28 +23,11 @@ public class Player_Weapon_CustomEditor : Editor
     {
         DrawDefaultInspector();
         Player_Weapon _weapon = (Player_Weapon)target;
-        _DrawText($"DPS: {_weapon.hitDamage * _weapon.attackSpeed}", Color.red, TextAnchor.MiddleCenter, 25);
+        CustomEditorAssistance_._DrawText($"attack every {1f / _weapon.attackSpeed} s ", Color.gray);
+        CustomEditorAssistance_._DrawText($"DPS: {_weapon.hitDamage * _weapon.attackSpeed}", Color.red, TextAnchor.MiddleCenter, 25);
         serializedObject.ApplyModifiedProperties();
     }
-    private void _DrawText(string _text, Color _newColor, int _fontSize = 15)
-    {
-        GUIStyle guiStyle = new GUIStyle();
-        guiStyle.normal.textColor = _newColor;
-        guiStyle.fontSize = _fontSize;
-        GUILayout.Label(_text, guiStyle);
-    }
-    private void _DrawText(string _text, Color _newColor, TextAnchor alignment, int _fontSize = 15)
-    {
-        GUIStyle guiStyle = new GUIStyle();
-        guiStyle.normal.textColor = _newColor;
-        guiStyle.alignment = alignment;
-        guiStyle.fontSize = _fontSize;
-        GUILayout.Label(_text, guiStyle);
-    }
-    private void _DrawProperty(string _propertyName)
-    {
-        var property = serializedObject.FindProperty(_propertyName);
-        EditorGUILayout.PropertyField(property);
-    }
+    
+    
 }
 #endif
