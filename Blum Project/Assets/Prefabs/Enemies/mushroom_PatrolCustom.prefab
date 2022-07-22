@@ -174,12 +174,13 @@ GameObject:
   m_Component:
   - component: {fileID: 524614685250456605}
   - component: {fileID: 524614685250456600}
+  - component: {fileID: 6142032273139415984}
   - component: {fileID: 524614685250456607}
   - component: {fileID: 524614685250456604}
   - component: {fileID: 524614685250456606}
   - component: {fileID: 524614685250456595}
   m_Layer: 7
-  m_Name: mushroom
+  m_Name: mushroom_PatrolCustom
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -213,8 +214,28 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   data: {fileID: 524614685250456604}
-  maxHealth: 15
+  maxHealth: 2
   knockMultiplayer: 1
+--- !u!114 &6142032273139415984
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 524614685250456601}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5e4c71c640ba9e54b9fb6967a2e841f8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  refer: {fileID: 524614685250456604}
+  damagePerHit: 1
+  inAirSpeedMultiplayer: 0.7
+  maxGroundSpeed: 100
+  groundMask:
+    serializedVersion: 2
+    m_Bits: 64
+  _stopMove: 0
 --- !u!114 &524614685250456607
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -227,21 +248,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 09f7cf8962dcf624a8f661b0c09085a3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  data: {fileID: 524614685250456604}
-  enemyType: 0
-  damagePerHit: 2
-  inAirSpeedMultiplayer: 0.7
-  maxGroundSpeed: 100
-  maxChaseSpeed: 0
-  groundMask:
-    serializedVersion: 2
-    m_Bits: 64
+  enemyType: 2
+  data: {fileID: 6142032273139415984}
+  patrolPoints: []
   chaseHitBox: {x: 0, y: 0, z: 0}
   hitBoxSize: {x: 0, y: 0, z: 0}
   attackSpeed: 0
   groundAndPlayerMask:
     serializedVersion: 2
     m_Bits: 0
+  chaseSpeedMultiplayer: 2
 --- !u!114 &524614685250456604
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -254,7 +270,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9c8a9760f41e2ed4a9b5acc1be7d8c39, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  behaviour: {fileID: 524614685250456607}
+  behaviour: {fileID: 6142032273139415984}
   healthSystem: {fileID: 524614685250456600}
   rb: {fileID: 524614685250456606}
   collision: {fileID: 524614685250456595}

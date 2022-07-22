@@ -6,7 +6,7 @@ public class Enm_HealthSystem : MonoBehaviour, IDamagableByPlayer
 {
     public Enm_References data;
     [SerializeField]private int maxHealth;
-    public int currentHealth { get; private set; }
+    public float currentHealth { get; private set; }
     [SerializeField] private float knockMultiplayer = 1f;
     private int _hitID = -1;
     public delegate void DelHitted(Vector3 _hitInvokerPosition);
@@ -15,7 +15,7 @@ public class Enm_HealthSystem : MonoBehaviour, IDamagableByPlayer
     {
         currentHealth = maxHealth;
     }
-    public void OnHit(int _damage, int _hitID, Vector3 _hitInvokerPosition, float _weaponKnockForce)
+    public void OnHit(float _damage, int _hitID, Vector3 _hitInvokerPosition, float _weaponKnockForce)
     {
         if (this._hitID == _hitID) return;
         this._hitID = _hitID;

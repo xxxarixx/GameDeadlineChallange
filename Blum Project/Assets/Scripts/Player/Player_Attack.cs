@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class Player_Attack : MonoBehaviour
 {
-    public Player_References data;
+    public Player_References refer;
     public Player_Weapon weapon;
     private bool _isAttacking;
     private float _attackTime;
@@ -15,11 +15,11 @@ public class Player_Attack : MonoBehaviour
     }
     private void OnEnable()
     {
-        data.input.OnAttack += Input_OnAttack;
+        refer.input.OnAttack += Input_OnAttack;
     }
     private void OnDisable()
     {
-        data.input.OnAttack -= Input_OnAttack;
+        refer.input.OnAttack -= Input_OnAttack;
     }
     private List<IDamagableByPlayer> _objectsHitted = new List<IDamagableByPlayer>();
     private void Update()
@@ -35,16 +35,16 @@ public class Player_Attack : MonoBehaviour
             {
                 if(hit.TryGetComponent(out IDamagableByPlayer damagable))
                 {
-                    damagable.OnHit(weapon.hitDamage, transform.GetInstanceID(), data.attack_Pivolt.position, weapon.knockForce);
+                    damagable.OnHit(weapon.hitDamage, transform.GetInstanceID(), refer.attack_Pivolt.position, weapon.knockForce);
                     _objectsHitted.Add(damagable);
                 }
             }
-            data.movement.StopPlayerMove(new Vector2(0f,.1f));
+            refer.movement.StopPlayerMove(new Vector2(0f,.1f));
         }
     }
     private Vector3 _getHitBoxCenter()
     {
-        return data.attack_Pivolt.position + (data.flip_Pivolt.localScale.x * (weapon.hitBoxSize.x / 2) * Vector3.right);
+        return refer.attack_Pivolt.position + (refer.flip_Pivolt.localScale.x * (weapon.hitBoxSize.x / 2) * Vector3.right);
     }
     private void Input_OnAttack()
     {
@@ -53,20 +53,20 @@ public class Player_Attack : MonoBehaviour
         _isAttacking = true;
         if(weapon.otherCustomAnimation != null) 
         {
-            data.PlayAnimation(weapon.customAnimationHash, 1);
+            refer.PlayAnimation(weapon.customAnimationHash, 1);
         }
         else
         {
-            data.PlayAnimation(Player_References.animations.attack, 1);
+            refer.PlayAnimation(Player_References.animations.attack, 1);
         }
-        data.movement.SetMoveState(false);  
+        refer.movement.SetMoveState(false);  
     }
     public void AnimationEnded()
     {
         _attackTime = 1f / weapon.attackSpeed;
         _isAttacking = false;
-        data.ResetAnimationPriority();
-        data.movement.SetMoveState(true);
+        refer.ResetAnimationPriority();
+        refer.movement.SetMoveState(true);
         foreach (var _hitted in _objectsHitted)
         {
             _hitted.ResetHitID();

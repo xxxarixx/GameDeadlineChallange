@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class Player_Movement : MonoBehaviour
 {
-    [SerializeField] private Player_References data;
+    [SerializeField] private Player_References refer;
 
     [Header("Movement")]
     [SerializeField] private float speedOnGround = 500f;
@@ -46,19 +46,19 @@ public class Player_Movement : MonoBehaviour
     private void OnEnable()
     {
         _VeriableSetup();
-        data.input.OnJumpCancelled += _Input_OnJumpCancelled;
-        data.input.OnJumpJustPressed += _Input_OnJumpJustPressed;
+        refer.input.OnJumpCancelled += _Input_OnJumpCancelled;
+        refer.input.OnJumpJustPressed += _Input_OnJumpJustPressed;
     }
 
     private void OnDisable()
     {
-        data.input.OnJumpCancelled -= _Input_OnJumpCancelled;
-        data.input.OnJumpJustPressed -= _Input_OnJumpJustPressed;
+        refer.input.OnJumpCancelled -= _Input_OnJumpCancelled;
+        refer.input.OnJumpJustPressed -= _Input_OnJumpJustPressed;
     }
     private void OnDrawGizmos()
     {
         Gizmos.color = (grounded)?Color.green : Color.red;
-        Gizmos.DrawLine(data.flip_Pivolt.position, data.flip_Pivolt.position + Vector3.down * grounded_DistancePlayerGround);
+        Gizmos.DrawLine(refer.flip_Pivolt.position, refer.flip_Pivolt.position + Vector3.down * grounded_DistancePlayerGround);
     }
     #endregion
 
@@ -73,7 +73,7 @@ public class Player_Movement : MonoBehaviour
     }
     private void _GroundedAndCoyoteTime()
     {
-        var localGrounded = Physics2D.Raycast(data.flip_Pivolt.position, Vector2.down, grounded_DistancePlayerGround, groundLayerMask);
+        var localGrounded = Physics2D.Raycast(refer.flip_Pivolt.position, Vector2.down, grounded_DistancePlayerGround, groundLayerMask);
         if (_coyoteTimeUsed && _coyoteTimeEnded || localGrounded)
         {
             grounded = localGrounded;
@@ -95,7 +95,7 @@ public class Player_Movement : MonoBehaviour
         _isPerformingJump = (grounded) ? true : false;
         if (_isPerformingJump)
         {
-            data.PlayAnimation(Player_References.animations.jump,0);
+            refer.PlayAnimation(Player_References.animations.jump,0);
         }
     }
     private void _Input_OnJumpCancelled()
@@ -123,7 +123,7 @@ public class Player_Movement : MonoBehaviour
         //reset player velocity Y if player doesnt reached end jump curve velocity and pressed up jump key
         if (!_jumpReachedEnd)
         {
-            data.rb.velocity = new Vector2(data.rb.velocity.x, justpressJumpVelocity);
+            refer.rb.velocity = new Vector2(refer.rb.velocity.x, justpressJumpVelocity);
             _jumpReachedEnd = true;
         }
         _isPerformingJump = false;
@@ -131,27 +131,27 @@ public class Player_Movement : MonoBehaviour
     }
     private void _Jump_Action()
     {
-        if (data.input.jumpPressed && _isPerformingJump) _Jump_Perform();
-        if (data.rb.velocity.y < 0 && !grounded && _jumpReachedEnd) 
+        if (refer.input.jumpPressed && _isPerformingJump) _Jump_Perform();
+        if (refer.rb.velocity.y < 0 && !grounded && _jumpReachedEnd) 
         { 
-            data.PlayAnimation(Player_References.animations.jump, 0); 
+            refer.PlayAnimation(Player_References.animations.jump, 0); 
         }
     }
     private void _Movement_horizontal()
     {
-        _lastVelocityBeforeStop = (data.input.moveInput != Vector2.zero) ? data.input.moveInput : _lastVelocityBeforeStop;
+        _lastVelocityBeforeStop = (refer.input.moveInput != Vector2.zero) ? refer.input.moveInput : _lastVelocityBeforeStop;
         if (!_canMove) return;
         _Move(speed_current, _MoveAxis.Horizontal);
         _FlipBasedOnVelocity();
         if (grounded && !_isPerformingJump)
         {
-            if(Mathf.Abs(data.rb.velocity.x) > 0f)
+            if(Mathf.Abs(refer.rb.velocity.x) > 0f)
             {
-                data.PlayAnimation(Player_References.animations.walk,0);
+                refer.PlayAnimation(Player_References.animations.walk,0);
             }
             else
             {
-                data.PlayAnimation(Player_References.animations.idle,0);
+                refer.PlayAnimation(Player_References.animations.idle,0);
             }
         }
 
@@ -174,32 +174,32 @@ public class Player_Movement : MonoBehaviour
         Vector2 axis = (_axis == _MoveAxis.Horizontal)? new Vector2(1,0) : new Vector2(0,1);
         //invert axis to get velocity that shouldnt be changed by this movement
         Vector2 invertedAxis = (_axis == _MoveAxis.Horizontal) ? new Vector2(0, 1) : new Vector2(1, 0);
-        data.rb.velocity = axis * data.input.moveInput * _speed * Time.fixedDeltaTime + invertedAxis * data.rb.velocity;
+        refer.rb.velocity = axis * refer.input.moveInput * _speed * Time.fixedDeltaTime + invertedAxis * refer.rb.velocity;
     }
     private void _FixedUpdate_Debug()
     {
-        debug_rbVelocity = data.rb.velocity;
+        debug_rbVelocity = refer.rb.velocity;
     }
     private void _FlipBasedOnVelocity()
     {
-        var moveDir = (data.rb.velocity.x == 0)? _lastVelocityBeforeStop.x : data.rb.velocity.x;
-        data.flip_Pivolt.localScale = new Vector3((moveDir > 0f) ? Mathf.Abs(data.flip_Pivolt.localScale.x) : -Mathf.Abs(data.flip_Pivolt.localScale.x), data.flip_Pivolt.localScale.y, data.flip_Pivolt.localScale.z);
+        var moveDir = (refer.rb.velocity.x == 0)? _lastVelocityBeforeStop.x : refer.rb.velocity.x;
+        refer.flip_Pivolt.localScale = new Vector3((moveDir > 0f) ? Mathf.Abs(refer.flip_Pivolt.localScale.x) : -Mathf.Abs(refer.flip_Pivolt.localScale.x), refer.flip_Pivolt.localScale.y, refer.flip_Pivolt.localScale.z);
     }
     #endregion
 
     #region Public Functions
     public void SetMoveState(bool _canMove)
     {
-        if (!_canMove) data.rb.velocity = Vector2.zero;
+        if (!_canMove) refer.rb.velocity = Vector2.zero;
         this._canMove = _canMove;
     }
     public void StopPlayerMove()
     {
-        data.rb.velocity = Vector2.zero;
+        refer.rb.velocity = Vector2.zero;
     }
     public void StopPlayerMove(Vector2 offsetVelocity)
     {
-        data.rb.velocity = Vector2.zero + offsetVelocity;
+        refer.rb.velocity = Vector2.zero + offsetVelocity;
     }
     #endregion
 }

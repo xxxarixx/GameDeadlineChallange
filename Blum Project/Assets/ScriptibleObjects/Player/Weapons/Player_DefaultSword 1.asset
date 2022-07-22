@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 19eb3b6ee62db794c9578f1f491750eb, type: 3}
   m_Name: Player_DefaultSword 1
   m_EditorClassIdentifier: 
-  hitDamage: 6
+  hitDamage: 1
   attackSpeed: 1
   knockForce: 10
   hitBoxSize: {x: 1.22, y: 0.61, z: 0}

@@ -6,7 +6,7 @@ using CustomEditorAssistance;
 [CreateAssetMenu(menuName ="Player/New Weapon", fileName = "new Weapon")]
 public class Player_Weapon : ScriptableObject
 {
-    public int hitDamage;
+    public float hitDamage;
     [Tooltip("attack cooldown = (1f / attacks speed)")]public float attackSpeed;
     public float knockForce;
     public Vector3 hitBoxSize;

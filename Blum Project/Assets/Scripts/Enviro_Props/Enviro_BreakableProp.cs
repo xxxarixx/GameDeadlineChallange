@@ -4,14 +4,14 @@ using UnityEngine;
 
 public class Enviro_BreakableProp : MonoBehaviour,IDamagableByPlayer
 {
-    [SerializeField]private int maxHealth;
-    public int currentHealth { get; private set; }
+    [SerializeField]private float maxHealth;
+    public float currentHealth { get; private set; }
     private int hitID;
     void Start()
     {
         currentHealth = maxHealth;
     }
-    public void OnHit(int _damage, int _hitID, Vector3 _hitInvokerPosition, float _weaponKnockForce)
+    public void OnHit(float _damage, int _hitID, Vector3 _hitInvokerPosition, float _weaponKnockForce)
     {
         //detection one damage per swing
         if (this.hitID == _hitID) return;

@@ -11,7 +11,7 @@ public class Main_GameManager : MonoBehaviour
     {
         instance = this;
     }
-    public void SpawnDamagePopup(Vector3 _position, int _damageDealt)
+    public void SpawnDamagePopup(Vector3 _position, float _damageDealt)
     {
         var spawnedDamagePopup = Instantiate(ui_DamagePopup, canvas_World.transform);
         float positionRandomRange = 0.3f;

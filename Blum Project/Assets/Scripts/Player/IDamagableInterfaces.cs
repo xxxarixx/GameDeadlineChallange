@@ -9,7 +9,7 @@ public interface IDamagableByPlayer
     /// </summary>
     /// <param name="_damage"> damage </param>
     /// <param name="_hitID"> to detect deal damage per swing (only one per enemy) this can be any ID</param>
-    public void OnHit(int _damage, int _hitID, Vector3 _hitInvokerPosition, float _weaponKnockForce);
+    public void OnHit(float _damage, int _hitID, Vector3 _hitInvokerPosition, float _weaponKnockForce);
     /// <summary>
     /// reset swing
     /// </summary>
