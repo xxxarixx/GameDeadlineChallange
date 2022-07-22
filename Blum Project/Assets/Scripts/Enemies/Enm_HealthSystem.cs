@@ -9,6 +9,8 @@ public class Enm_HealthSystem : MonoBehaviour, IDamagableByPlayer
     public int currentHealth { get; private set; }
     [SerializeField] private float knockMultiplayer = 1f;
     private int _hitID = -1;
+    public delegate void DelHitted(Vector3 _hitInvokerPosition);
+    public event DelHitted OnGetHitted;
     void Start()
     {
         currentHealth = maxHealth;
@@ -20,6 +22,7 @@ public class Enm_HealthSystem : MonoBehaviour, IDamagableByPlayer
         currentHealth -= _damage;
         Main_GameManager.instance.SpawnDamagePopup(data.flip_Pivolt.position, _damage);
         StartCoroutine(KnockFromDirection(_CalculateKnockDirection(data.flip_Pivolt.position, _hitInvokerPosition), _weaponKnockForce));
+        OnGetHitted?.Invoke(_hitInvokerPosition);
         _DeadChecker();
     }
     private IEnumerator KnockFromDirection(Vector3 _knockDirection, float _weaponKnockForce)

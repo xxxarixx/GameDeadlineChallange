@@ -68,7 +68,10 @@ public class Enm_Behaviour : MonoBehaviour
         _SpeedSetup();
         _MoveSetup();
         _RaycastsLengthSetup();
+        data.healthSystem.OnGetHitted += _HealthSystem_OnGetHitted;
     }
+
+
     private void FixedUpdate()
     {
         if (_stopMove) data.PlayAnimation(Enm_References.animations.idle,0);
@@ -144,6 +147,13 @@ public class Enm_Behaviour : MonoBehaviour
         {
             _SetCurrentMoveSpeed(_MoveSpeed.InAir);
         }
+    }
+    private void _HealthSystem_OnGetHitted(Vector3 _hitInvokerPosition)
+    {
+        //hitted from behind
+        var dir = (_hitInvokerPosition - transform.position).normalized;
+        var frontDir = _FrontDirectiong();
+        if (Vector2.Dot(frontDir,dir) < 0) _Flip();
     }
     private void _AttackValidate()
     {
