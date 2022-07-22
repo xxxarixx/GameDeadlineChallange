@@ -2,7 +2,6 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
-#if UNITY_EDITOR
 namespace CustomEditorAssistance
 {
     public static class CustomEditorAssistance_
@@ -22,11 +21,12 @@ namespace CustomEditorAssistance
             guiStyle.fontSize = _fontSize;
             GUILayout.Label(_text, guiStyle);
         }
+        #if UNITY_EDITOR
         public static void _DrawProperty(SerializedObject serializedObject, string _propertyName)
         {
             var property = serializedObject.FindProperty(_propertyName);
             EditorGUILayout.PropertyField(property);
         }
+        #endif
     }
 }
-#endif
