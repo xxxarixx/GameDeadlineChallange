@@ -10,9 +10,10 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 19eb3b6ee62db794c9578f1f491750eb, type: 3}
-  m_Name: Player_DefaultSword
+  m_Name: Player_Spear
   m_EditorClassIdentifier: 
-  hitDamage: 3
-  attackSpeed: 1
-  hitBoxSize: {x: 1.22, y: 0.61, z: 0}
+  hitDamage: 5
+  attackSpeed: 2
+  knockForce: 5
+  hitBoxSize: {x: 2.2, y: 0.3, z: 0}
   otherCustomAnimation: {fileID: 7400000, guid: 52803e73cf051994ab2d37b39a4b6a2e, type: 2}
