@@ -30,15 +30,6 @@ public class Player_Attack : MonoBehaviour
     {
         if (_isAttacking)
         {
-            var hits = Physics2D.OverlapBoxAll(_getHitBoxCenter(), weapon.hitBoxSize, 0f);
-            foreach (var hit in hits)
-            {
-                if(hit.TryGetComponent(out IDamagableByPlayer damagable))
-                {
-                    damagable.OnHit(weapon.hitDamage, transform.GetInstanceID(), refer.attack_Pivolt.position, weapon.knockForce);
-                    _objectsHitted.Add(damagable);
-                }
-            }
             refer.movement.StopPlayerMove(new Vector2(0f,.1f));
         }
     }
@@ -66,11 +57,23 @@ public class Player_Attack : MonoBehaviour
         _attackTime = 1f / weapon.attackSpeed;
         _isAttacking = false;
         refer.ResetAnimationPriority();
-        if(!refer.healthSystem.isDead())refer.movement.SetMoveState(true);
+        refer.movement.SetMoveState(true);
         foreach (var _hitted in _objectsHitted)
         {
             _hitted.ResetHitID();
         }
         _objectsHitted.Clear();
+    }
+    public void HurtFrame()
+    {
+        var hits = Physics2D.OverlapBoxAll(_getHitBoxCenter(), weapon.hitBoxSize, 0f);
+        foreach (var hit in hits)
+        {
+            if (hit.TryGetComponent(out IDamagableByPlayer damagable))
+            {
+                damagable.OnHit(weapon.hitDamage, transform.GetInstanceID(), refer.attack_Pivolt.position, weapon.knockForce);
+                _objectsHitted.Add(damagable);
+            }
+        }
     }
 }

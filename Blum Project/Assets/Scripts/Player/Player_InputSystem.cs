@@ -168,6 +168,17 @@ public partial class @Player_InputSystem : IInputActionCollection2, IDisposable
                 },
                 {
                     ""name"": """",
+                    ""id"": ""aa73a6c9-7a50-4b21-ac79-00b03e2ee687"",
+                    ""path"": ""<Gamepad>/leftStick"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""MoveInput"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
                     ""id"": ""ae0edbe6-9770-4dec-abe9-8b6ef5f51b83"",
                     ""path"": ""<Keyboard>/w"",
                     ""interactions"": """",
@@ -181,6 +192,17 @@ public partial class @Player_InputSystem : IInputActionCollection2, IDisposable
                     ""name"": """",
                     ""id"": ""84d401a4-7085-40d6-8b58-06399b6b6a7d"",
                     ""path"": ""<Keyboard>/upArrow"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Jump"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""44e26147-df59-4a93-b692-25296a2c0342"",
+                    ""path"": ""<Gamepad>/leftTrigger"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
@@ -214,6 +236,17 @@ public partial class @Player_InputSystem : IInputActionCollection2, IDisposable
                     ""name"": """",
                     ""id"": ""4cb7b8c0-506e-4abe-8ad6-933f41b79301"",
                     ""path"": ""<Keyboard>/j"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Attack"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""87ed192e-6a6d-48d1-a90f-fd41bf25df3a"",
+                    ""path"": ""<Gamepad>/rightTrigger"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",

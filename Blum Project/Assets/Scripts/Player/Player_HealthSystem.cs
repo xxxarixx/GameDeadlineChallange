@@ -120,7 +120,7 @@ public class Player_HealthSystem : MonoBehaviour,IDamagableByEnemy
         refer.movement.SetMoveState(false);
         refer.movement.MoveIndependentOnPlayerInput(defaultPlayerKnockBack * _knockBackMultiplayer, knockDirection, false);
         yield return new WaitForSeconds(.2f);
-        if(!isDead()) refer.movement.SetMoveState(true);
+        refer.movement.SetMoveState(true);
 
     }
     public void Heal(int HeartsCount)
@@ -155,6 +155,8 @@ public class Player_HealthSystem : MonoBehaviour,IDamagableByEnemy
         refer.movement.SetMoveState(false);
         Main_UiController.instance.deadScreen.SetActive(true);
         refer.PlayAnimation(Player_References.animations.idle, 10);
+        refer.rb.gravityScale = 0;
+        refer.collision.enabled = false;
     }
     public bool isDead()
     {

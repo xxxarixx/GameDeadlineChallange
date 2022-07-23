@@ -13,6 +13,7 @@ public class Enm_OnCollisionDealDamage : MonoBehaviour
     private void OnCollisionStay2D(Collision2D collision)
     {
         if (_data == null) return;
+        if (_data.refer.healthSystem.IsDead()) return;
         if(collision.gameObject.TryGetComponent(out IDamagableByEnemy damagableByEnemy))
         {
             damagableByEnemy.OnHit(damageToDeal, _data.refer.flip_Pivolt.position);

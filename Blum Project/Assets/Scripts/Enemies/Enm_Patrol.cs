@@ -101,6 +101,7 @@ public class Enm_Patrol : MonoBehaviour
     }
     private void FixedUpdate()
     {
+        if (_data.refer.healthSystem.IsDead()) return;
         switch (enemyType)
         {
             case EnemyType.Patrol_Edge_Edge:

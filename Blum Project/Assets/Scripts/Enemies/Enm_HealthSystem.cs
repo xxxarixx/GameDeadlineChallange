@@ -5,7 +5,7 @@ using UnityEngine;
 public class Enm_HealthSystem : MonoBehaviour, IDamagableByPlayer
 {
     public Enm_References refer;
-    [SerializeField]private int maxHealth;
+    [SerializeField] private int maxHealth;
     public float currentHealth { get; private set; }
     public float knockMultiplayer = 1f;
     private int _hitID = -1;
@@ -21,9 +21,9 @@ public class Enm_HealthSystem : MonoBehaviour, IDamagableByPlayer
     }
     void OnDrawGizmosSelected()
     {
-        if(refer == null)
+        if (refer == null)
         {
-            if(TryGetComponent(out Enm_References enm_References))
+            if (TryGetComponent(out Enm_References enm_References))
             {
                 refer = enm_References;
             }
@@ -31,6 +31,7 @@ public class Enm_HealthSystem : MonoBehaviour, IDamagableByPlayer
     }
     public void OnHit(float _damage, int _hitID, Vector3 _hitInvokerPosition, float _weaponKnockForce)
     {
+        if (IsDead()) return;
         if (this._hitID == _hitID) return;
         this._hitID = _hitID;
         currentHealth -= _damage;
@@ -41,13 +42,15 @@ public class Enm_HealthSystem : MonoBehaviour, IDamagableByPlayer
     }
     private IEnumerator KnockFromDirection(Vector3 _knockDirection, float _weaponKnockForce)
     {
+        refer.PlayAnimation(Enm_References.animations.hurt, 10);
         refer.behaviour.SetForceStopMovement(true);
-        refer.rb.velocity = new Vector2(_knockDirection.x,refer.rb.velocity.y) * (knockMultiplayer * _weaponKnockForce);
+        refer.rb.velocity = new Vector2(_knockDirection.x, refer.rb.velocity.y) * (knockMultiplayer * _weaponKnockForce);
         yield return new WaitForSeconds(.125f);
         refer.behaviour.SetForceStopMovement(false);
+        refer.ResetAnimationPriority();
     }
-    private Vector3 _CalculateKnockDirection(Vector3 _myPosition, Vector3 _hitInvokerPosition) 
-    { 
+    private Vector3 _CalculateKnockDirection(Vector3 _myPosition, Vector3 _hitInvokerPosition)
+    {
         return (_myPosition - _hitInvokerPosition).normalized;
     }
     public void ResetHitID()
@@ -58,6 +61,17 @@ public class Enm_HealthSystem : MonoBehaviour, IDamagableByPlayer
     {
         if (currentHealth > 0) return;
         Main_GameManager.instance.DropItem(dropItemID, refer.flip_Pivolt.position + .2f * Vector3.up, dropCount, dropEverythingInXseconds);
+        refer.behaviour.SetForceStopMovement(true);
+        refer.PlayAnimation(Enm_References.animations.death, 10);
+        refer.rb.gravityScale = 0;
+        refer.collision.enabled = false;
+    }
+    public void EndedDeadAnimation()
+    {
         Destroy(gameObject);
+    }
+    public bool IsDead()
+    {
+        return currentHealth <= 0f;
     }
 }

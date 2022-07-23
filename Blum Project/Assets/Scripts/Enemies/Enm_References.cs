@@ -24,6 +24,8 @@ public class Enm_References : MonoBehaviour
         walk,
         idle,
         attack,
+        hurt,
+        death
     }
     private int _walkAnimationHash { get { return Animator.StringToHash(walkAnimation.name); } set { } }
     [SerializeField] private AnimationClip walkAnimation;
@@ -31,6 +33,10 @@ public class Enm_References : MonoBehaviour
     [SerializeField] private AnimationClip idleAnimation;
     private int _attackAnimationHash { get { return Animator.StringToHash(attackAnimation.name); } set { } }
     [SerializeField] private AnimationClip attackAnimation;
+    private int _hurtAnimationHash { get { return Animator.StringToHash(hurtAnimation.name); } set { } }
+    [SerializeField] private AnimationClip hurtAnimation;
+    private int _deathAnimationHash { get { return Animator.StringToHash(deathAnimation.name); } set { } }
+    [SerializeField] private AnimationClip deathAnimation;
 
     public void PlayAnimation(animations _animationEnum, int _priority)
     {
@@ -61,6 +67,10 @@ public class Enm_References : MonoBehaviour
                 return _idleAnimationHash;
             case animations.attack:
                 return _attackAnimationHash;
+            case animations.hurt:
+                return _hurtAnimationHash;
+            case animations.death:
+                return _deathAnimationHash;
             default:
                 return _idleAnimationHash;
         }

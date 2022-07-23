@@ -500,6 +500,8 @@ MonoBehaviour:
   _dec_checkForKnockOutOfPatrol_UpdateRate: 0.3
   _dec_activePathVisualizesion: 1
   dec_OnLastPointDo: 0
+  eehit_damageToDeal: 1
+  eehit_knockbackToPlayerMultiplayer: 1
   eehit_attackSpeed: 0
   eehit_chaseHitBox: {x: 0, y: 0, z: 0}
   eehit_hitBoxSize: {x: 0, y: 0, z: 0}
@@ -530,6 +532,7 @@ MonoBehaviour:
   walkAnimation: {fileID: 7400000, guid: 3fe83edf1cf64ce47900ad2f27716849, type: 2}
   idleAnimation: {fileID: 7400000, guid: 622220ad39ae5b54d9b0be1e246c48c8, type: 2}
   attackAnimation: {fileID: 0}
+  hurtAnimation: {fileID: 7400000, guid: 9ce67a71319045341a74b90d72e9e8d2, type: 2}
 --- !u!50 &9051112285789393194
 Rigidbody2D:
   serializedVersion: 4

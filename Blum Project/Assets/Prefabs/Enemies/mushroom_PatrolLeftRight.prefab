@@ -73,6 +73,7 @@ GameObject:
   - component: {fileID: 524614684482490998}
   - component: {fileID: 524614684482490997}
   - component: {fileID: 524614684482490987}
+  - component: {fileID: 7511788410546028597}
   m_Layer: 7
   m_Name: enm_Sprend
   m_TagString: Untagged
@@ -164,6 +165,33 @@ Animator:
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorControllerStateOnDisable: 0
+--- !u!114 &7511788410546028597
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 524614684482490999}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4785c73f2b2b74a498a6830183913aff, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  events:
+  - m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 524614685250456600}
+        m_TargetAssemblyTypeName: Enm_HealthSystem, Assembly-CSharp
+        m_MethodName: EndedDeadAnimation
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!1 &524614685250456601
 GameObject:
   m_ObjectHideFlags: 0
@@ -240,6 +268,8 @@ MonoBehaviour:
   _dec_checkForKnockOutOfPatrol_UpdateRate: 0.3
   _dec_activePathVisualizesion: 1
   dec_OnLastPointDo: 0
+  eehit_damageToDeal: 1
+  eehit_knockbackToPlayerMultiplayer: 1
   eehit_attackSpeed: 0
   eehit_chaseHitBox: {x: 0, y: 0, z: 0}
   eehit_hitBoxSize: {x: 0, y: 0, z: 0}
@@ -289,6 +319,8 @@ MonoBehaviour:
   walkAnimation: {fileID: 7400000, guid: 3fe83edf1cf64ce47900ad2f27716849, type: 2}
   idleAnimation: {fileID: 7400000, guid: 622220ad39ae5b54d9b0be1e246c48c8, type: 2}
   attackAnimation: {fileID: 0}
+  hurtAnimation: {fileID: 7400000, guid: 9ce67a71319045341a74b90d72e9e8d2, type: 2}
+  deathAnimation: {fileID: 7400000, guid: b731d7974fc96744388fee0a774e2acd, type: 2}
 --- !u!50 &524614685250456606
 Rigidbody2D:
   serializedVersion: 4

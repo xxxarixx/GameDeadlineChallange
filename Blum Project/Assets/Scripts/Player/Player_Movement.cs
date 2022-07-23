@@ -24,6 +24,8 @@ public class Player_Movement : MonoBehaviour
     private bool _jumpReachedEnd = false;
     private bool _coyoteTimeUsed = false;
     private bool _coyoteTimeEnded = false;
+    private bool _jumpStartedOnce = false;
+    private float _jumpDurationProcess = 0f;
 
     [Header("Grounded")]
     [SerializeField] private float grounded_DistancePlayerGround;
@@ -39,6 +41,7 @@ public class Player_Movement : MonoBehaviour
     private void FixedUpdate()
     {
         Main_CameraController.instance.SetVelocityOffset(refer.rb.velocity);
+        _jumpDurationProcess -= Time.fixedDeltaTime;
         _FixedUpdate_Debug();
         _GroundedAndCoyoteTime();
         _Movement_horizontal();
@@ -80,6 +83,7 @@ public class Player_Movement : MonoBehaviour
             grounded = localGrounded;
             if (grounded)
             {
+                _jumpStartedOnce = true;
                 _coyoteTimeUsed = false;
                 _coyoteTimeEnded = false;
                 StopCoroutine(_CoyoteTimeCountDown());
@@ -92,16 +96,21 @@ public class Player_Movement : MonoBehaviour
     }
     private void _Input_OnJumpJustPressed()
     {
+        //just cancelled once and jump duraction is for bloking player ability to jump twice to build up heigher jump then usuall
+        if (!_jumpStartedOnce) return;
+        if (_jumpDurationProcess > 0f) return;
+        else _jumpDurationProcess = .2f;
         if (!_canMove) return;
         _isPerformingJump = (grounded) ? true : false;
-        if (_isPerformingJump)
-        {
-            refer.PlayAnimation(Player_References.animations.jump,0);
-        }
+        
     }
     private void _Input_OnJumpCancelled()
     {
+        if (!_canMove) return;
+        if (!_jumpStartedOnce) return;
+        if (_jumpStartedOnce) _jumpStartedOnce = false;
         _Jump_Reset();
+        
     }
     private void _VeriableSetup()
     {
@@ -110,10 +119,11 @@ public class Player_Movement : MonoBehaviour
     }
     private void _Jump_Perform()
     {
-        _jumpPressProgress += Time.deltaTime;
-        _Move(jumpVelocity.Evaluate(_jumpPressProgress), _MoveAxis.Verical);
         _jumpReachedEnd = false;
-        if(_jumpPressProgress >= _maxJumpProgressTime)
+        refer.PlayAnimation(Player_References.animations.jump, 0);
+        _jumpPressProgress += Time.fixedDeltaTime;
+        MoveIndependentOnPlayerInput(jumpVelocity.Evaluate(_jumpPressProgress), Vector2.up);
+        if(_jumpPressProgress >= _maxJumpProgressTime && !_jumpReachedEnd)
         {
             _jumpReachedEnd = true;
             _Jump_Reset();
@@ -132,10 +142,10 @@ public class Player_Movement : MonoBehaviour
     }
     private void _Jump_Action()
     {
-        if (refer.input.jumpPressed && _isPerformingJump) _Jump_Perform();
+        if (refer.input.jumpPressed && _isPerformingJump ) _Jump_Perform();
         if (refer.rb.velocity.y < 0 && !grounded && _jumpReachedEnd) 
         { 
-            refer.PlayAnimation(Player_References.animations.jump, 0); 
+            refer.PlayAnimation(Player_References.animations.falling, 0); 
         }
     }
     private void _Movement_horizontal()
@@ -176,6 +186,7 @@ public class Player_Movement : MonoBehaviour
         Vector2 axis = (_axis == _MoveAxis.Horizontal)? new Vector2(1,0) : new Vector2(0,1);
         //invert axis to get velocity that shouldnt be changed by this movement
         Vector2 invertedAxis = (_axis == _MoveAxis.Horizontal) ? new Vector2(0, 1) : new Vector2(1, 0);
+        if((_axis == _MoveAxis.Verical)) Debug.Log($"invert velocity added:{invertedAxis * refer.rb.velocity} speed Multiplayed: {_speed * Time.fixedDeltaTime}");
         refer.rb.velocity = axis * refer.input.moveInput * _speed * Time.fixedDeltaTime + invertedAxis * refer.rb.velocity;
     }
     public void MoveIndependentOnPlayerInput(float _speed, Vector2 _direction, bool _beEffectedByMoveState = true)
@@ -198,6 +209,7 @@ public class Player_Movement : MonoBehaviour
     #region Public Functions
     public void SetMoveState(bool _canMove)
     {
+        if (_canMove && refer.healthSystem.isDead()) return;
         this._canMove = _canMove;
         if (!_canMove) refer.rb.velocity = Vector2.zero;
     }
