@@ -66,7 +66,7 @@ public class Player_Attack : MonoBehaviour
         _attackTime = 1f / weapon.attackSpeed;
         _isAttacking = false;
         refer.ResetAnimationPriority();
-        refer.movement.SetMoveState(true);
+        if(!refer.healthSystem.isDead())refer.movement.SetMoveState(true);
         foreach (var _hitted in _objectsHitted)
         {
             _hitted.ResetHitID();

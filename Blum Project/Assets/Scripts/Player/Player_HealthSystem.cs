@@ -8,8 +8,14 @@ public class Player_HealthSystem : MonoBehaviour,IDamagableByEnemy
     public Player_References refer;
     [SerializeField] private int maxStartHealth = 3;
     [SerializeField] private int maxHealth = 20;
-    public int currentHealth;
-    public List<HealthContainer> healthContainers = new List<HealthContainer>();
+    [SerializeField] private float invicibilityTimeAfterHit = 0.3f;
+    [SerializeField] private float defaultPlayerKnockBack = 400f;
+    private float invicibilityProcess = 0f;
+    public delegate void nothingDele();
+    public event nothingDele OnInvicibilityEnded;
+    public event nothingDele OnInvicibilityStarted;
+    public int currentHealth { get; private set; }
+    private List<HealthContainer> healthContainers = new List<HealthContainer>();
     [System.Serializable]
     public class HealthContainer 
     {
@@ -25,42 +31,56 @@ public class Player_HealthSystem : MonoBehaviour,IDamagableByEnemy
     private void Start()
     {
         currentHealth = 0;
-        foreach (Transform child in refer.healthContainerHolder)
+        foreach (Transform child in Main_UiController.instance.healthContainerHolder)
         {
             Destroy(child.gameObject);
         }
         _AddHeartContainers(maxStartHealth);
     }
+    void OnEnable()
+    {
+        OnInvicibilityStarted += Player_HealthSystem_OnInvicibilityStarted; 
+        OnInvicibilityEnded += Player_HealthSystem_OnInvicibilityEnded;
+    }
+
+    void OnDisable()
+    {
+        OnInvicibilityStarted -= Player_HealthSystem_OnInvicibilityStarted;
+        OnInvicibilityEnded -= Player_HealthSystem_OnInvicibilityEnded;
+    }
+    private void Player_HealthSystem_OnInvicibilityEnded()
+    {
+        refer.mainSprend.color = Color.white;
+    }
+
+    private void Player_HealthSystem_OnInvicibilityStarted()
+    {
+        refer.mainSprend.color = Color.yellow;
+    }
 
     void Update()
     {
-        if (UnityEngine.InputSystem.Keyboard.current.pKey.wasPressedThisFrame)
+        if (invicibilityProcess > 0f)
         {
-            OnHit(1);
+            invicibilityProcess -= Time.deltaTime;
+            if (invicibilityProcess < 0f) OnInvicibilityEnded?.Invoke();
         }
-        if (UnityEngine.InputSystem.Keyboard.current.kKey.wasPressedThisFrame)
-        {
-            OnHit(4);
-        }
-        if (UnityEngine.InputSystem.Keyboard.current.nKey.wasPressedThisFrame)
-        {
-            _AddHeartContainers(1);
-        }
-        if (UnityEngine.InputSystem.Keyboard.current.mKey.wasPressedThisFrame)
-        {
-            _RemoveHeartContainers(1);
-        }
-        if (UnityEngine.InputSystem.Keyboard.current.oKey.wasPressedThisFrame)
-        {
-            Heal(1);
-        }
+    }
+    private bool _CanBeHurted()
+    {
+        return invicibilityProcess <= 0f;
+    }
+    private void _SetInvicibilityTime(float time)
+    {
+        if (time > 0f) OnInvicibilityStarted?.Invoke();
+        invicibilityProcess = time;
     }
     private void _AddHeartContainers(int HeartContainerCount, bool full = true)
     {
         for (int i = 0; i < HeartContainerCount; i++)
         {
             if (healthContainers.Count >= maxHealth) return;
-            var spawnedContainer = Instantiate(refer.fullHealthContainerPrefab, refer.healthContainerHolder.transform);
+            var spawnedContainer = Instantiate(refer.fullHealthContainerPrefab, Main_UiController.instance.healthContainerHolder.transform);
             healthContainers.Add(new HealthContainer(spawnedContainer.GetComponent<Image>(), true));
             _SetContainerState(healthContainers[healthContainers.Count - 1],true);
             if (full) Heal(1);
@@ -81,12 +101,27 @@ public class Player_HealthSystem : MonoBehaviour,IDamagableByEnemy
         }
         if (healthContainers.Count == 0) _CheckForPlayerDeath();
     }
-
-    public void OnHit(int _damage)
+    public void OnHit(int _damage,Vector3 _invokerPosition, float _knockbackMultiplayer)
     {
+        if (!_CanBeHurted()) return;
         currentHealth -= (currentHealth - _damage > 0)? _damage : currentHealth;
         _UpdateHeartContainer(_damage);
+        _knockbackPlayer(_invokerPosition, _knockbackMultiplayer);
         _CheckForPlayerDeath();
+    }
+    private void _knockbackPlayer(Vector3 _invokerPosition, float _knockBackMultiplayer)
+    {
+        _SetInvicibilityTime(invicibilityTimeAfterHit);
+        var knockDir = (refer.flip_Pivolt.position - _invokerPosition).normalized;
+        StartCoroutine(_knockBackProcessing(knockDir, _knockBackMultiplayer));
+    }
+    private IEnumerator _knockBackProcessing(Vector3 knockDirection, float _knockBackMultiplayer)
+    {
+        refer.movement.SetMoveState(false);
+        refer.movement.MoveIndependentOnPlayerInput(defaultPlayerKnockBack * _knockBackMultiplayer, knockDirection, false);
+        yield return new WaitForSeconds(.2f);
+        if(!isDead()) refer.movement.SetMoveState(true);
+
     }
     public void Heal(int HeartsCount)
     {
@@ -116,8 +151,14 @@ public class Player_HealthSystem : MonoBehaviour,IDamagableByEnemy
     }
     private void _CheckForPlayerDeath()
     {
-        if (maxStartHealth > 0) return;
+        if (!isDead()) return;
         refer.movement.SetMoveState(false);
+        Main_UiController.instance.deadScreen.SetActive(true);
         refer.PlayAnimation(Player_References.animations.idle, 10);
     }
+    public bool isDead()
+    {
+        return currentHealth <= 0f;
+    }
 }
+ 

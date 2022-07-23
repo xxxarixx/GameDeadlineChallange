@@ -179,6 +179,7 @@ GameObject:
   - component: {fileID: 524614685250456604}
   - component: {fileID: 524614685250456606}
   - component: {fileID: 524614685250456595}
+  - component: {fileID: 1999053068532140821}
   m_Layer: 7
   m_Name: mushroom_PatrolLeftRight
   m_TagString: Untagged
@@ -213,9 +214,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8a63574ede041384181b7aa5d5fcf7d1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  data: {fileID: 524614685250456604}
+  refer: {fileID: 524614685250456604}
   maxHealth: 2
   knockMultiplayer: 1
+  dropItemID: 0
+  dropCount: 5
+  dropEverythingInXseconds: 0.3
 --- !u!114 &524614685250456607
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -229,15 +233,20 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   enemyType: 0
-  data: {fileID: 6142032273139415984}
-  patrolPoints: []
-  chaseHitBox: {x: 0, y: 0, z: 0}
-  hitBoxSize: {x: 0, y: 0, z: 0}
-  attackSpeed: 0
-  groundAndPlayerMask:
+  _data: {fileID: 6142032273139415984}
+  dec_patrolPointsHolder: {fileID: 0}
+  dec_patrolPoints: []
+  _dec_lastSavedPatrolPointsTransfroms: []
+  _dec_checkForKnockOutOfPatrol_UpdateRate: 0.3
+  _dec_activePathVisualizesion: 1
+  dec_OnLastPointDo: 0
+  eehit_attackSpeed: 0
+  eehit_chaseHitBox: {x: 0, y: 0, z: 0}
+  eehit_hitBoxSize: {x: 0, y: 0, z: 0}
+  eehit_groundAndPlayerMask:
     serializedVersion: 2
     m_Bits: 0
-  chaseSpeedMultiplayer: 2
+  eehit_chaseSpeedMultiplayer: 2
 --- !u!114 &6142032273139415984
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -257,7 +266,6 @@ MonoBehaviour:
   groundMask:
     serializedVersion: 2
     m_Bits: 64
-  _stopMove: 0
 --- !u!114 &524614685250456604
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -318,3 +326,16 @@ CircleCollider2D:
   m_Offset: {x: 0.48815715, y: 0.21454036}
   serializedVersion: 2
   m_Radius: 0.25747597
+--- !u!114 &1999053068532140821
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 524614685250456601}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7c85b8e7058768248b1feba2023c0f4d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  damageToDeal: 1

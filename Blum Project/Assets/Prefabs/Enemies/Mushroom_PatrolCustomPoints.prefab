@@ -430,9 +430,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8a63574ede041384181b7aa5d5fcf7d1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  data: {fileID: 9051112285789393192}
+  refer: {fileID: 9051112285789393192}
   maxHealth: 2
   knockMultiplayer: 1
+  dropItemID: 0
+  dropCount: 5
+  dropEverythingInXseconds: 0.1
 --- !u!114 &3451777267240117892
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -452,7 +455,6 @@ MonoBehaviour:
   groundMask:
     serializedVersion: 2
     m_Bits: 64
-  _stopMove: 0
 --- !u!114 &9051112285789393195
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -466,6 +468,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   enemyType: 2
+  _data: {fileID: 0}
   dec_patrolPointsHolder: {fileID: 8852894814962983496}
   dec_patrolPoints:
   - PointName: 
@@ -493,7 +496,10 @@ MonoBehaviour:
     onReachedPatrolPoint:
       m_PersistentCalls:
         m_Calls: []
-  dec_pointsState: 1
+  _dec_lastSavedPatrolPointsTransfroms: []
+  _dec_checkForKnockOutOfPatrol_UpdateRate: 0.3
+  _dec_activePathVisualizesion: 1
+  dec_OnLastPointDo: 0
   eehit_attackSpeed: 0
   eehit_chaseHitBox: {x: 0, y: 0, z: 0}
   eehit_hitBoxSize: {x: 0, y: 0, z: 0}

@@ -5,6 +5,10 @@ using UnityEngine;
 public class Enviro_BreakableProp : MonoBehaviour,IDamagableByPlayer
 {
     [SerializeField]private float maxHealth;
+    [Header("DropItems:")]
+    public int dropItemID;
+    public int dropCount = 1;
+    [Range(0f,1f)]public float dropEverythingInXseconds;
     public float currentHealth { get; private set; }
     private int hitID;
     void Start()
@@ -27,6 +31,7 @@ public class Enviro_BreakableProp : MonoBehaviour,IDamagableByPlayer
     private void _DeadChecker()
     {
         if (currentHealth > 0) return;
+        Main_GameManager.instance.DropItem(dropItemID, transform.position + .2f * Vector3.up, dropCount, dropEverythingInXseconds);
         Destroy(gameObject);
     }
 }

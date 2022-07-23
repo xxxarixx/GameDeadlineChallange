@@ -11,15 +11,16 @@ public class Player_References : MonoBehaviour
     public Player_HealthSystem healthSystem;
     public Rigidbody2D rb;
     public CircleCollider2D collision;
+    public SpriteRenderer mainSprend;
     public Transform flip_Pivolt;
     public Transform attack_Pivolt;
     public Animator anim;
     public GameObject fullHealthContainerPrefab;
-    public Transform healthContainerHolder;
     public Sprite fullHealthSprite;
     public Sprite emptyHealthSprite;
     private void Awake()
     {
+        instance = this;
         _currentAnimationPriority = -1;
     }
     #region animation handling

@@ -38,6 +38,7 @@ public class Player_Movement : MonoBehaviour
     #region Unity Functions
     private void FixedUpdate()
     {
+        Debug.Log(_canMove);
         _FixedUpdate_Debug();
         _GroundedAndCoyoteTime();
         _Movement_horizontal();
@@ -170,11 +171,18 @@ public class Player_Movement : MonoBehaviour
     }
     private void _Move(float _speed, _MoveAxis _axis)
     {
+        if (!_canMove) return;
         //axis that player should move
         Vector2 axis = (_axis == _MoveAxis.Horizontal)? new Vector2(1,0) : new Vector2(0,1);
         //invert axis to get velocity that shouldnt be changed by this movement
         Vector2 invertedAxis = (_axis == _MoveAxis.Horizontal) ? new Vector2(0, 1) : new Vector2(1, 0);
         refer.rb.velocity = axis * refer.input.moveInput * _speed * Time.fixedDeltaTime + invertedAxis * refer.rb.velocity;
+    }
+    public void MoveIndependentOnPlayerInput(float _speed, Vector2 _direction, bool _beEffectedByMoveState = true)
+    {
+        if (!_canMove && _beEffectedByMoveState) return;
+        Vector2 axisToLeave = new Vector2((_direction.x == 0) ? 1f : 0f, (_direction.y == 0) ? 1f : 0f);
+        refer.rb.velocity = _direction * _speed * Time.fixedDeltaTime + axisToLeave * refer.rb.velocity;
     }
     private void _FixedUpdate_Debug()
     {
@@ -190,8 +198,8 @@ public class Player_Movement : MonoBehaviour
     #region Public Functions
     public void SetMoveState(bool _canMove)
     {
-        if (!_canMove) refer.rb.velocity = Vector2.zero;
         this._canMove = _canMove;
+        if (!_canMove) refer.rb.velocity = Vector2.zero;
     }
     public void StopPlayerMove()
     {

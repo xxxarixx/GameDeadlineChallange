@@ -18,5 +18,5 @@ public interface IDamagableByPlayer
 
 public interface IDamagableByEnemy
 {
-    public void OnHit(int _damage);
+    public void OnHit(int _damage, Vector3 _invokerPosition, float _knockBackMultiplayer = 1f);
 }

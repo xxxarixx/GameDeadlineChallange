@@ -51,6 +51,8 @@ public class Enm_Patrol : MonoBehaviour
     }
     private int _dec_lastPatrolPointsCount;
     [Header("patrol Edge_Edge WHitBoxChase")]
+    public int eehit_damageToDeal = 1;
+    public int eehit_knockbackToPlayerMultiplayer = 1;
     public float eehit_attackSpeed;
     public Vector3 eehit_chaseHitBox;
     public Vector3 eehit_hitBoxSize;
@@ -269,6 +271,19 @@ public class Enm_Patrol : MonoBehaviour
         _data.refer.ResetAnimationPriority();
         _data.SetForceStopMovement(false);
         _eehit_attackAnimationEnded = true;
+    }
+    public void AttackDealDamageFrame()
+    {
+        var attackHitBox = Physics2D.OverlapBoxAll(_data.refer.attack_Pivolt.position + (_data.refer.flip_Pivolt.localScale.x * (eehit_hitBoxSize.x / 2) * Vector3.right), eehit_hitBoxSize, 0f);
+        foreach (var item in attackHitBox)
+        {
+            if (item == null) continue;
+            if (item.TryGetComponent(out IDamagableByEnemy damagableByEnemy))
+            {
+                damagableByEnemy.OnHit(eehit_damageToDeal, _data.refer.flip_Pivolt.position, eehit_knockbackToPlayerMultiplayer);
+            }
+        }
+        
     }
     private void _Draw_ChaseHitBox()
     {
@@ -592,7 +607,6 @@ public class Enm_Patrol : MonoBehaviour
         {
             if (!_dec_lastSavedPatrolPointsTransfroms.Contains(Child)) DestroyImmediate(Child.gameObject, true);
         }
-        Gizmos.color = Color.white;
         for (int i = 0; i < dec_patrolPoints.Count; i++)
         {
             var point = dec_patrolPoints[i];
@@ -600,6 +614,7 @@ public class Enm_Patrol : MonoBehaviour
             if (point.pointTransform == null) continue;
             if (_GetNextPoint(i) == null) continue;
             if (_GetNextPoint(i).pointTransform == null) continue;
+            Gizmos.color = (i == 0) ? Color.white : Color.gray;
             Gizmos.DrawSphere(point.pointTransform.position, .1f);
             Gizmos.DrawLine(point.pointTransform.position, _GetNextPoint(i).pointTransform.position);
         }
@@ -651,6 +666,8 @@ public class Enm_Patrol_Editor : Editor
                 
                 break;
             case Enm_Patrol.EnemyType.Patrol_Edge_Edge_WHitBoxChase:
+                CustomEditorAssistance_._DrawProperty(serializedObject, nameof(_Patrol.eehit_damageToDeal));
+                CustomEditorAssistance_._DrawProperty(serializedObject, nameof(_Patrol.eehit_knockbackToPlayerMultiplayer));
                 CustomEditorAssistance_._DrawProperty(serializedObject, nameof(_Patrol.eehit_chaseSpeedMultiplayer));
                 CustomEditorAssistance_._DrawProperty(serializedObject, nameof(_Patrol.eehit_chaseHitBox));
                 CustomEditorAssistance_._DrawProperty(serializedObject, nameof(_Patrol.eehit_hitBoxSize));
