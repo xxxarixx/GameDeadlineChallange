@@ -38,7 +38,7 @@ public class Player_Movement : MonoBehaviour
     #region Unity Functions
     private void FixedUpdate()
     {
-        Debug.Log(_canMove);
+        Main_CameraController.instance.SetVelocityOffset(refer.rb.velocity);
         _FixedUpdate_Debug();
         _GroundedAndCoyoteTime();
         _Movement_horizontal();

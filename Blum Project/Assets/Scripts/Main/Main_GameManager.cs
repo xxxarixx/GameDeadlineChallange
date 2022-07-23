@@ -55,7 +55,7 @@ public class Main_GameManager : MonoBehaviour
             Main_UiController.instance.coinCountText.SetText(GetCoinText());
         }
         var item = items[id];
-        Debug.Log(item.name);
+        //Debug.Log(item.name);
         if (item.weapon != null)
         {
             //add weapon to player

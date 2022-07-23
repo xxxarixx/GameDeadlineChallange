@@ -193,6 +193,20 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+  - m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 524614685250456607}
+        m_TargetAssemblyTypeName: Enm_Patrol, Assembly-CSharp
+        m_MethodName: AttackDealDamageFrame
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!1 &524614685250456601
 GameObject:
   m_ObjectHideFlags: 0
@@ -288,6 +302,8 @@ MonoBehaviour:
   _dec_checkForKnockOutOfPatrol_UpdateRate: 0.3
   _dec_activePathVisualizesion: 1
   dec_OnLastPointDo: 0
+  eehit_damageToDeal: 1
+  eehit_knockbackToPlayerMultiplayer: 1
   eehit_attackSpeed: 0.9
   eehit_chaseHitBox: {x: 4, y: 1.13, z: 0}
   eehit_hitBoxSize: {x: 1.36, y: 0.54, z: 0}
