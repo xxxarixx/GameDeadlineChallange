@@ -8,11 +8,16 @@ public class Player_References : MonoBehaviour
     public Player_Input input;
     public Player_Movement movement;
     public Player_Attack attack;
+    public Player_HealthSystem healthSystem;
     public Rigidbody2D rb;
     public CircleCollider2D collision;
     public Transform flip_Pivolt;
     public Transform attack_Pivolt;
     public Animator anim;
+    public GameObject fullHealthContainerPrefab;
+    public Transform healthContainerHolder;
+    public Sprite fullHealthSprite;
+    public Sprite emptyHealthSprite;
     private void Awake()
     {
         _currentAnimationPriority = -1;

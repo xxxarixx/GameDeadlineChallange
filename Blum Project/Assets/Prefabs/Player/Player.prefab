@@ -175,6 +175,7 @@ GameObject:
   - component: {fileID: 7485639862947088915}
   - component: {fileID: 7485639862947088917}
   - component: {fileID: 7485639862947088918}
+  - component: {fileID: 806084740}
   m_Layer: 8
   m_Name: Player
   m_TagString: Player
@@ -212,11 +213,16 @@ MonoBehaviour:
   input: {fileID: 7485639862947088917}
   movement: {fileID: 7485639862947088915}
   attack: {fileID: 7485639862947088918}
+  healthSystem: {fileID: 806084740}
   rb: {fileID: 7485639862947088914}
   collision: {fileID: 7485639862947088913}
   flip_Pivolt: {fileID: 7485639863113711213}
   attack_Pivolt: {fileID: 7485639861609837688}
   anim: {fileID: 7485639861493491050}
+  fullHealthContainerPrefab: {fileID: 8926545824127414436, guid: 6d7058199d54c084b8095f85034c13e3, type: 3}
+  healthContainerHolder: {fileID: 0}
+  fullHealthSprite: {fileID: 21300000, guid: ba5696f589783134eb13edae77070958, type: 3}
+  emptyHealthSprite: {fileID: 21300000, guid: 8e94700a3eb058a4ca2a33b08fb1ddd3, type: 3}
   walkAnimation: {fileID: 7400000, guid: 26f03d9aadf71734ca3279b26814eca4, type: 2}
   idleAnimation: {fileID: 7400000, guid: 5218fd8facb96244a80b28684706e91b, type: 2}
   jumpAnimation: {fileID: 7400000, guid: 595d30048618dcc4cb17aa9c32f90989, type: 2}
@@ -271,7 +277,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f74efca67fa204444a46e134be07b2f9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  data: {fileID: 7485639862947088916}
+  refer: {fileID: 7485639862947088916}
   speedOnGround: 350
   speedInAir: 250
   justpressJumpVelocity: 5
@@ -347,8 +353,24 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f8efe3b57639d8b43b96e50ff1f42b7c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  data: {fileID: 7485639862947088916}
+  refer: {fileID: 7485639862947088916}
   weapon: {fileID: 11400000, guid: f653a1545d91b1e49b141b9b11487893, type: 2}
+--- !u!114 &806084740
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7485639862947088927}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0401af794aefe394f95059cc6bf0c8d2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  refer: {fileID: 7485639862947088916}
+  maxStartHealth: 3
+  maxHealth: 12
+  healthContainers: []
 --- !u!1 &7485639863113711212
 GameObject:
   m_ObjectHideFlags: 0
