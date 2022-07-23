@@ -31,4 +31,11 @@ public class Main_CameraController : MonoBehaviour
     {
         appliedVelocityOffset = new Vector3(Mathf.Clamp(velocityOffset.x * velocityCameraOffsetMultiplayer.x, -xLimit, xLimit), Mathf.Clamp(velocityOffset.y * velocityCameraOffsetMultiplayer.y, -yLimit,yLimit));
     }
+    void OnDrawGizmos()
+    {
+        if (!Application.isPlaying)
+        {
+            _SetCameraPosition(target.position + offset);
+        }
+    }
 }
