@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
 using CustomEditorAssistance;
+using System.Linq;
+using UnityEngine.Events;
 [RequireComponent(typeof(Enm_Behaviour))]
 public class Enm_Patrol : MonoBehaviour
 {
@@ -11,16 +13,43 @@ public class Enm_Patrol : MonoBehaviour
     {
         Patrol_Edge_Edge,
         Patrol_Edge_Edge_WHitBoxChase,
-        Patrol_DecleratedPoints
+        Patrol_DeceleratedPoints
     }
     public EnemyType enemyType;
     #endregion
-    private Enm_Behaviour _data;
+    [HideInInspector]public Enm_Behaviour _data;
 
 
     [Header("patrol Declerated points")]
-    public List<Transform> dec_patrolPoints = new List<Transform>();
+    public Transform dec_patrolPointsHolder;
+    public List<PatrolPoint> dec_patrolPoints = new List<PatrolPoint>();
+    public List<Transform> _dec_lastSavedPatrolPointsTransfroms = new List<Transform>();
+    [Range(0.01f,2f)]public float _dec_checkForKnockOutOfPatrol_UpdateRate = 0.3f;
+    public bool _dec_activePathVisualizesion = true;
+    private float _dec_kockOutOfPatrol_process = 0f;
+    private int _dec_currentPoint;
+    private float _dec_jumpDelay;
+    private bool _dec_reversed = false;
+    [System.Serializable]
+    public class PatrolPoint 
+    {
+        public string PointName = "Point";
+        public Transform pointTransform;
+        public UnityEvent onReachedPatrolPoint; 
+        public PatrolPoint (Transform pointTransform)
+        {
+            this.pointTransform = pointTransform;
+        }
+    }
 
+    public PatrolPointsState dec_OnLastPointDo;
+    public enum PatrolPointsState
+    {
+        nothing,
+        reverse,
+        loop
+    }
+    private int _dec_lastPatrolPointsCount;
     [Header("patrol Edge_Edge WHitBoxChase")]
     public float eehit_attackSpeed;
     public Vector3 eehit_chaseHitBox;
@@ -48,7 +77,19 @@ public class Enm_Patrol : MonoBehaviour
     }
     private void OnValidate()
     {
-        eehit_attackSpeed = Mathf.Clamp(eehit_attackSpeed, 0f, float.MaxValue);
+        switch (enemyType)
+        {
+            case EnemyType.Patrol_Edge_Edge:
+                break;
+            case EnemyType.Patrol_Edge_Edge_WHitBoxChase:
+                eehit_attackSpeed = Mathf.Clamp(eehit_attackSpeed, 0f, float.MaxValue);
+                break;
+            case EnemyType.Patrol_DeceleratedPoints:
+                break;
+            default:
+                break;
+        }
+
     }
     private void Start()
     {
@@ -68,8 +109,8 @@ public class Enm_Patrol : MonoBehaviour
                 _ChaseMovement(out bool isChasing);
                 if(!isChasing)_PatrolMovement();
                 break;
-            case EnemyType.Patrol_DecleratedPoints:
-                _PatrolMovementWDeclaratedPoints();
+            case EnemyType.Patrol_DeceleratedPoints:
+                _PatrolMovementWDeceleratedPoints();
                 break;
             default:
                 break;
@@ -84,7 +125,7 @@ public class Enm_Patrol : MonoBehaviour
             _RaycastsLengthSetup();
             _Draw_Raycast_Grounded();
             _Draw_Raycast_GroundedPatrolDireciton();
-            _Draw_Raycast_InFront();
+            _Draw_Raycast_InFront(_ee_groundPatrolDirecitonRaycastLength);
         }
         switch (enemyType)
         {
@@ -98,34 +139,34 @@ public class Enm_Patrol : MonoBehaviour
                 _Draw_Raycast_AttackValidate();
                 _Draw_CanChase_Raycast();
                 break;
+            case EnemyType.Patrol_DeceleratedPoints:
+                _Draw_ActivePathVisualizesion();
+                _Draw_PatrolDeceleratedPointsAndConnections();
+                _Draw_Raycast_InFront(.75f);
+                _Draw_Raycast_Grounded();
+                _Draw_Raycast_GroundedPatrolDireciton();
+                break;
+            default:
+                break;
+        }
+
+    }
+    private void OnDrawGizmosSelected()
+    {
+        switch (enemyType)
+        {
+            case EnemyType.Patrol_Edge_Edge:
+                break;
+            case EnemyType.Patrol_Edge_Edge_WHitBoxChase:
+                break;
+            case EnemyType.Patrol_DeceleratedPoints:
+                _PatrolDeceleratedPointsEditorUpdateRemoveAndAdd();
+                break;
             default:
                 break;
         }
     }
     #endregion
-
-    private void _HealthSystem_OnGetHitted(Vector3 _hitInvokerPosition)
-    {
-        //hitted from behind
-        var dir = (_hitInvokerPosition - transform.position).normalized;
-        var frontDir = _data._FrontDirectiong();
-        if (Vector2.Dot(frontDir,dir) < 0)
-        {
-            _data._Flip();
-            switch (enemyType)
-            {
-                case EnemyType.Patrol_Edge_Edge:
-                    break;
-                case EnemyType.Patrol_Edge_Edge_WHitBoxChase:
-                    _eehit_attackSpeedCooldown = (1f / eehit_attackSpeed) / 4;
-                    break;
-                case EnemyType.Patrol_DecleratedPoints:
-                    break;
-                default:
-                    break;
-            }
-        } 
-    }
 
     #region Patrol Edge_Edge
     private void _PatrolMovement()
@@ -157,7 +198,7 @@ public class Enm_Patrol : MonoBehaviour
     private bool _HittingInFront_Raycast() => Physics2D.Raycast(_data.refer.grounded_Pivolt.position, _data._FrontDirectiong(), _ee_groundPatrolDirecitonRaycastLength, _data.groundMask);
     private void _Draw_Raycast_Grounded() => _data._Draw_Raycast(_data.refer.flip_Pivolt.position, Vector3.down, _ee_groundRaycastLength, Color.white);
     private void _Draw_Raycast_GroundedPatrolDireciton() => _data._Draw_Raycast(_data.refer.grounded_Pivolt.position, Vector3.down, _ee_groundPatrolDirecitonRaycastLength, Color.yellow);
-    private void _Draw_Raycast_InFront() => _data._Draw_Raycast(_data.refer.grounded_Pivolt.position, _data._FrontDirectiong(), _ee_groundPatrolDirecitonRaycastLength, Color.green);
+    private void _Draw_Raycast_InFront(float length) => _data._Draw_Raycast(_data.refer.grounded_Pivolt.position, _data._FrontDirectiong(), length, Color.green);
     #endregion
 
     #region Patrol Edge_Edge W HitBox Chase
@@ -244,12 +285,348 @@ public class Enm_Patrol : MonoBehaviour
     private void _Draw_Raycast_AttackValidate() => _data._Draw_Raycast(_data.refer.attack_Pivolt.position, _data._FrontDirectiong(), eehit_hitBoxSize.x, Color.gray);
     #endregion
 
-    #region Patrol W Declarated Points
-    private void _PatrolMovementWDeclaratedPoints()
+    #region Patrol W decelerated Points
+    private void _PatrolMovementWDeceleratedPoints()
     {
-        if (dec_patrolPoints.Count == 0) _data.refer.PlayAnimation(Enm_References.animations.idle,2);
-    }
+        if (dec_patrolPoints.Count == 0 || dec_patrolPoints.Count == 1)
+        {
+            _data.refer.PlayAnimation(Enm_References.animations.idle, 2);
+            return;
+        } 
+        if (_data._stopMove) return;
+        //if enemy is knocked out of platform then check if he can reach any point if not then change enemy type to patrol edge edge
+        bool IsNearAnyPoint()
+        {
+            bool isNear = false;
+            for (int i = 0; i < dec_patrolPoints.Count; i++)
+            {
+                var curPatrolPoint = dec_patrolPoints[i];
+                //1.get distance between enemy and current patrol point
+                //2.get hit ground in this distance
+                //3.if hitted ground then check if distance from hit and patrol point is less then 0.5f can return to path but if not hitted then can return to path too
+                //4.if in point 3. distance is too high then change enemy state to patrol
+                var distance = Vector3.Distance(_data.refer.flip_Pivolt.position, curPatrolPoint.pointTransform.position);
+                var direction = (curPatrolPoint.pointTransform.position - _data.refer.flip_Pivolt.position).normalized;
+                var hittedGround = Physics2D.Raycast(_data.refer.flip_Pivolt.position, direction, distance, _data.groundMask);
+                if(hittedGround.collider != null && Vector2.Distance(hittedGround.point, curPatrolPoint.pointTransform.position) < 1f || hittedGround.collider == null)
+                {
+                    isNear = true;
+                    break;
+                }
+            }
+            return isNear;
+        }
+        if(_data.refer.healthSystem.knockMultiplayer > 0f)
+        {
+            if(_dec_kockOutOfPatrol_process <= 0f)
+            {
+                if (!IsNearAnyPoint())
+                {
+                    enemyType = EnemyType.Patrol_Edge_Edge;
+                    _dec_kockOutOfPatrol_process = _dec_checkForKnockOutOfPatrol_UpdateRate;
+                    return;
+                }
+            }
+            else
+            {
+                _dec_kockOutOfPatrol_process -= Time.deltaTime;
+            }
+        }
+        //is near next point
+        if (Vector3.Distance(_data.refer.flip_Pivolt.position, dec_patrolPoints[_dec_currentPoint].pointTransform.position) < .4f )
+        {
+            //reached destination
+            dec_patrolPoints[_dec_currentPoint].onReachedPatrolPoint?.Invoke();
+            _dec_currentPoint = _GetNextPointIndex(_dec_currentPoint);
+        }
+        
+        var moveDir = (dec_patrolPoints[_dec_currentPoint].pointTransform.position - _data.refer.flip_Pivolt.position).normalized;
+        var frontHit = Physics2D.Raycast(_data.refer.grounded_Pivolt.position, _data._FrontDirectiong(), .75f, _data.groundMask);
+        bool pointIsHeigher = (dec_patrolPoints[_dec_currentPoint].pointTransform.position.y - _data.refer.flip_Pivolt.position.y) > .2f;
+        float pointDistanceX = Mathf.Abs(_data.refer.flip_Pivolt.position.x - dec_patrolPoints[_dec_currentPoint].pointTransform.position.x);
+        //automatic jump based on point height
+        if ((frontHit || !frontHit && !_HittingGroundedPatrolDireciton_Raycast()) && pointIsHeigher && _HittingGrounded_Raycast() && _dec_jumpDelay <= 0f)
+        {
+            _data.Move(Mathf.Abs(_data.refer.flip_Pivolt.position.y - dec_patrolPoints[_dec_currentPoint].pointTransform.position.y) * 205f, Enm_Behaviour._MoveAxis.Vertical);
+            _dec_jumpDelay = 0.75f;
+        }
+        //move and rotate torward destination if isnt close enough
+        if(pointDistanceX > .1f)
+        {
+            _data.FaceTarget(moveDir);
+            _data.Move(_data.currentSpeed, Enm_Behaviour._MoveAxis.Horizontal);
+        }
+        else
+        {
+            //just let enemy fall if is too close on X axis
+            _data.refer.rb.velocity = new Vector2(0f,_data.refer.rb.velocity.y);
+        }
 
+        _data.refer.PlayAnimation(Enm_References.animations.walk, 0);
+        if (_dec_jumpDelay > 0f)
+        {
+            _dec_jumpDelay -= Time.deltaTime;
+        }
+    }
+    private PatrolPoint _GetNextPoint(int currentPoint)
+    {
+        int nextPointIndex = 0;
+        switch (dec_OnLastPointDo)
+        {
+            case PatrolPointsState.reverse:
+                if (currentPoint + 1 >= dec_patrolPoints.Count)
+                {
+                    nextPointIndex = currentPoint - 1;
+                    _dec_reversed = true;
+                }
+                else
+                {
+                    if(_dec_reversed && currentPoint - 1 < 0)
+                    {
+                        _dec_reversed = !_dec_reversed;
+                    }
+                    if(_dec_reversed) nextPointIndex = currentPoint - 1; else nextPointIndex = currentPoint + 1;
+                    
+                }
+                break;
+            case PatrolPointsState.loop:
+                if (currentPoint + 1 >= dec_patrolPoints.Count)
+                {
+                    nextPointIndex = 0;
+                }
+                else
+                {
+                    nextPointIndex = currentPoint + 1;
+                }
+                break;
+            case PatrolPointsState.nothing:
+                if (currentPoint + 1 >= dec_patrolPoints.Count)
+                {
+                    _data.SetForceStopMovement(true);
+                    _data.refer.PlayAnimation(Enm_References.animations.idle, 0);
+                }
+                else
+                {
+                    nextPointIndex = currentPoint + 1;
+                }
+                break;
+                    default:
+                break;
+        }
+        return dec_patrolPoints[nextPointIndex];
+    }
+    private int _GetNextPointIndex(int currentPoint)
+    {
+        int nextPointIndex = 0;
+        switch (dec_OnLastPointDo)
+        {
+            case PatrolPointsState.reverse:
+                if (currentPoint + 1 >= dec_patrolPoints.Count)
+                {
+                    nextPointIndex = currentPoint - 1;
+                    _dec_reversed = true;
+                }
+                else
+                {
+                    if (_dec_reversed && currentPoint - 1 < 0)
+                    {
+                        _dec_reversed = !_dec_reversed;
+                    }
+                    
+                    if (_dec_reversed) nextPointIndex = currentPoint - 1; else nextPointIndex = currentPoint + 1;
+                    
+                }
+                break;
+            case PatrolPointsState.loop:
+                if (currentPoint + 1 >= dec_patrolPoints.Count)
+                {
+                    nextPointIndex = 0;
+                }
+                else
+                {
+                    nextPointIndex = currentPoint + 1;
+                }
+                break;
+            case PatrolPointsState.nothing:
+                if (currentPoint + 1 >= dec_patrolPoints.Count)
+                {
+                    _data.SetForceStopMovement(true);
+                    _data.refer.PlayAnimation(Enm_References.animations.idle, 0);
+                }
+                else
+                {
+                    nextPointIndex = currentPoint + 1;
+                }
+                break;
+            default:
+                break;
+        }
+        return nextPointIndex;
+    }
+    private void _HealthSystem_OnGetHitted(Vector3 _hitInvokerPosition)
+    {
+        //hitted from behind
+        var dir = (_hitInvokerPosition - transform.position).normalized;
+        var frontDir = _data._FrontDirectiong();
+        if (Vector2.Dot(frontDir,dir) < 0)
+        {
+            
+            switch (enemyType)
+            {
+                case EnemyType.Patrol_Edge_Edge:
+                    _data._Flip();
+                    break;
+                case EnemyType.Patrol_Edge_Edge_WHitBoxChase:
+                    _data._Flip();
+                    _eehit_attackSpeedCooldown = (1f / eehit_attackSpeed) / 4;
+                    break;
+                case EnemyType.Patrol_DeceleratedPoints:
+                    break;
+                default:
+                    break;
+            }
+        } 
+    }
+    private string _GetPointName(int currentPoint)
+    {
+        return (dec_patrolPoints[currentPoint].PointName != string.Empty) ? dec_patrolPoints[currentPoint].PointName : $"Point{currentPoint}";
+    }
+    private void _PatrolDeceleratedPointsEditorUpdateRemoveAndAdd()
+    {
+        if (dec_patrolPointsHolder == null || dec_patrolPoints.Count < 2) return;
+        void CreateControlPointTransform(int index)
+        {
+            GameObject go = new GameObject();
+            go.transform.SetParent(dec_patrolPointsHolder);
+            go.transform.position = transform.position;
+            int patrolPointIndex = index;
+            go.name = _GetPointName(index);
+            var selectedPoint = dec_patrolPoints[patrolPointIndex];
+            selectedPoint.pointTransform = go.transform;
+            _dec_lastSavedPatrolPointsTransfroms.Clear();
+            foreach (var item in dec_patrolPoints)
+            {
+                _dec_lastSavedPatrolPointsTransfroms.Add(item.pointTransform);
+            }
+        }
+        //check if someone remove point transform property or destroyed from Hierarchy manually
+        if(dec_patrolPoints.Any(x => x.pointTransform == null) && dec_patrolPointsHolder.childCount != dec_patrolPoints.Count)
+        {
+            for (int i = 0; i < dec_patrolPoints.Count; i++)
+            {
+                if (dec_patrolPoints[i].pointTransform == null) CreateControlPointTransform(i);
+            }
+        }
+        else if(dec_patrolPoints.Any(x => x.pointTransform == null) && dec_patrolPointsHolder.childCount == dec_patrolPoints.Count)
+        {
+            for (int i = 0; i < dec_patrolPoints.Count; i++)
+            {
+                if (dec_patrolPoints[i].pointTransform == null) dec_patrolPoints[i].pointTransform = _dec_lastSavedPatrolPointsTransfroms[i];
+            }
+        }
+        //check for null transforms in last saved
+        if (_dec_lastSavedPatrolPointsTransfroms != null)
+        {
+            for (int i = 0; i < _dec_lastSavedPatrolPointsTransfroms.Count; i++)
+            {
+                if (_dec_lastSavedPatrolPointsTransfroms[i] == null) _dec_lastSavedPatrolPointsTransfroms.RemoveAt(i);
+            }
+        }
+        else
+        {
+            _dec_lastSavedPatrolPointsTransfroms = new List<Transform>();
+        }
+        //sibling index corrector and name corrector
+        for (int i = 0; i < dec_patrolPoints.Count; i++)
+        {
+            if (dec_patrolPoints[i].pointTransform.GetSiblingIndex() != i) dec_patrolPoints[i].pointTransform.SetSiblingIndex(i);
+            if (dec_patrolPoints[i].pointTransform.name != _GetPointName(i)) dec_patrolPoints[i].pointTransform.name = _GetPointName(i);
+        }
+
+        //update list remove input 
+        if (_dec_lastSavedPatrolPointsTransfroms.Count > dec_patrolPoints.Count)
+        {
+            int indexToRemove = -1;
+            for (int i = 0; i < _dec_lastSavedPatrolPointsTransfroms.Count; i++)
+            {
+                if (i >= dec_patrolPoints.Count)
+                {
+                    //last index removed
+                    indexToRemove = _dec_lastSavedPatrolPointsTransfroms.Count - 1;
+                    break;
+                }
+                else
+                {
+                    //removed something in middle
+                    if (_dec_lastSavedPatrolPointsTransfroms[i] != dec_patrolPoints[i].pointTransform)
+                    {
+                        indexToRemove = i;
+                        break;
+                    }
+                }
+            }
+            if (indexToRemove != -1) DestroyImmediate(_dec_lastSavedPatrolPointsTransfroms[indexToRemove].gameObject, true);
+            _dec_lastSavedPatrolPointsTransfroms.RemoveAt(indexToRemove);
+        }
+
+
+      
+        
+        if (dec_patrolPointsHolder.childCount != dec_patrolPoints.Count)
+        {
+            if (dec_patrolPointsHolder.childCount < dec_patrolPoints.Count)
+            {
+                CreateControlPointTransform(dec_patrolPointsHolder.childCount - 1);
+            }
+        }
+        
+        
+    }
+    private void _Draw_PatrolDeceleratedPointsAndConnections()
+    {
+        if (dec_patrolPointsHolder == null) return;
+        if (dec_patrolPoints.Count < 2) return;
+        if (!_dec_activePathVisualizesion) return;
+        
+        foreach (Transform Child in dec_patrolPointsHolder)
+        {
+            if (!_dec_lastSavedPatrolPointsTransfroms.Contains(Child)) DestroyImmediate(Child.gameObject, true);
+        }
+        Gizmos.color = Color.white;
+        for (int i = 0; i < dec_patrolPoints.Count; i++)
+        {
+            var point = dec_patrolPoints[i];
+            if (point == null) continue;
+            if (point.pointTransform == null) continue;
+            if (_GetNextPoint(i) == null) continue;
+            if (_GetNextPoint(i).pointTransform == null) continue;
+            Gizmos.DrawSphere(point.pointTransform.position, .1f);
+            Gizmos.DrawLine(point.pointTransform.position, _GetNextPoint(i).pointTransform.position);
+        }
+        
+    }
+    public void _OnReachedEnd_Wait(float waitTime)
+    {
+        StartCoroutine(waitAndIdle(waitTime));
+    }
+    private IEnumerator waitAndIdle(float waitTime)
+    {
+        _data.SetForceStopMovement(true,true,false);
+        _data.refer.PlayAnimation(Enm_References.animations.idle, 0);
+        yield return new WaitForSeconds(waitTime);
+        _data.SetForceStopMovement(false);
+    }
+    private void _Draw_ActivePathVisualizesion()
+    {
+        if (_dec_activePathVisualizesion)
+        {
+            _data._Draw_Circle(_data.refer.flip_Pivolt.position + 1f * Vector3.up, .2f, Color.green);
+        }
+        else
+        {
+            _data._Draw_Circle(_data.refer.flip_Pivolt.position + 1f * Vector3.up, .2f, Color.red);
+        }
+    }
     #endregion
     
     
@@ -281,8 +658,21 @@ public class Enm_Patrol_Editor : Editor
                 CustomEditorAssistance_._DrawProperty(serializedObject, nameof(_Patrol.eehit_groundAndPlayerMask));
                 CustomEditorAssistance_._DrawText($"attack every {1f / _Patrol.eehit_attackSpeed} s ", Color.gray);
                 break;
-            case Enm_Patrol.EnemyType.Patrol_DecleratedPoints:
+            case Enm_Patrol.EnemyType.Patrol_DeceleratedPoints:
+                if(_Patrol.dec_patrolPoints.Count < 2) CustomEditorAssistance_._DrawText($"add {2 - _Patrol.dec_patrolPoints.Count} more patrol points to move between them otherwise he will play only idle animation", Color.red, 13, true);
+                CustomEditorAssistance_._DrawProperty(serializedObject, nameof(_Patrol.dec_patrolPointsHolder));
+                CustomEditorAssistance_._DrawProperty(serializedObject, nameof(_Patrol.dec_OnLastPointDo));
                 CustomEditorAssistance_._DrawProperty(serializedObject, nameof(_Patrol.dec_patrolPoints));
+                if (GUILayout.Button("Reverse List", GUILayout.Width(85f)))
+                {
+                    _Patrol.dec_patrolPoints.Reverse();
+                    _Patrol._dec_lastSavedPatrolPointsTransfroms.Reverse();
+                }
+                CustomEditorAssistance_._DrawProperty(serializedObject, nameof(_Patrol._dec_activePathVisualizesion));
+                if (_Patrol._data.refer.healthSystem.knockMultiplayer > 0f)CustomEditorAssistance_._DrawProperty(serializedObject, nameof(_Patrol._dec_checkForKnockOutOfPatrol_UpdateRate));
+                if(_Patrol._data.refer.healthSystem.knockMultiplayer > 0f)CustomEditorAssistance_._DrawText($"tip1: enemy knock back multiplayer is heigher then 0 so you should set patrol point after every obstacle to avoid complications ", Color.yellow, 13, true);
+                CustomEditorAssistance_._DrawText($"tip2: if point transfrom was removed then it will automatically repaint when pressed on object that holding this script, so dont worry :)", Color.gray, 13, true);
+                //CustomEditorAssistance_._DrawProperty(serializedObject, nameof(_Patrol._dec_lastSavedPatrolPointsTransfroms));
                 break;
             default:
                 break;

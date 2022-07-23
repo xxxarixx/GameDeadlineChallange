@@ -7,7 +7,7 @@ public class Enm_HealthSystem : MonoBehaviour, IDamagableByPlayer
     public Enm_References data;
     [SerializeField]private int maxHealth;
     public float currentHealth { get; private set; }
-    [SerializeField] private float knockMultiplayer = 1f;
+    public float knockMultiplayer = 1f;
     private int _hitID = -1;
     public delegate void DelHitted(Vector3 _hitInvokerPosition);
     public event DelHitted OnGetHitted;

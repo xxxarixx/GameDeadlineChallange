@@ -7,6 +7,10 @@ public class Enm_Behaviour : MonoBehaviour
     public Enm_References refer;
     [Header("allType")]
     [SerializeField] private int damagePerHit;
+
+    /// <summary>
+    /// to change use: _SetCurrentMoveSpeed();
+    /// </summary>
     public float currentSpeed { get; private set; }
     public float inAirSpeedMultiplayer = .7f;
     [SerializeField] private float maxGroundSpeed = 100f;
@@ -16,7 +20,10 @@ public class Enm_Behaviour : MonoBehaviour
     //speed with modifires
     private float _speedInAir;
     private float _speedGrounded;
-    [HideInInspector]public bool _stopMove;
+    /// <summary>
+    /// to change use: SetForceStopMovement();
+    /// </summary>
+    [HideInInspector] public bool _stopMove { get; private set; }
     private void Awake()
     {
         _SpeedSetup();
@@ -55,10 +62,10 @@ public class Enm_Behaviour : MonoBehaviour
         currentSpeed = _speedGrounded;
         _speedInAir = currentSpeed * inAirSpeedMultiplayer;
     }
-    public void SetForceStopMovement(bool stopMove)
+    public void SetForceStopMovement(bool stopMove, bool stopInXAxis = true, bool stopInYAxis = true)
     {
         this._stopMove = stopMove;
-        refer.rb.velocity = Vector3.zero;
+        refer.rb.velocity = new Vector2((stopInXAxis)?0:refer.rb.velocity.x, (stopInYAxis)?0:refer.rb.velocity.y);
     }
     public float _GetSpeedEnumValue(SpeedType moveSpeedType)
     {
@@ -99,6 +106,17 @@ public class Enm_Behaviour : MonoBehaviour
         _moveDirX = -_moveDirX;
         refer.flip_Pivolt.localScale = new Vector3(-refer.flip_Pivolt.localScale.x, refer.flip_Pivolt.localScale.y, refer.flip_Pivolt.localScale.z);
     }
+    public void FaceTarget(Vector3 targetDirection)
+    {
+        if(targetDirection.x < 0)
+        {
+            if (refer.flip_Pivolt.localScale.x > 0) _Flip();
+        }
+        else if(targetDirection.x > 0)
+        {
+            if (refer.flip_Pivolt.localScale.x < 0) _Flip();
+        }
+    }
     public Vector3 _FrontDirectiong()
     {
         return refer.flip_Pivolt.right * Mathf.Clamp(_moveDirX, -1, 1);
@@ -107,5 +125,15 @@ public class Enm_Behaviour : MonoBehaviour
     {
         Gizmos.color = color;
         Gizmos.DrawLine(origin, origin + direction * length);
+    }
+    public void _Draw_WireCircle(Vector3 origin,float radius, Color color)
+    {
+        Gizmos.color = color;
+        Gizmos.DrawWireSphere(origin, radius);
+    }
+    public void _Draw_Circle(Vector3 origin, float radius, Color color)
+    {
+        Gizmos.color = color;
+        Gizmos.DrawSphere(origin, radius);
     }
 }

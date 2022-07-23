@@ -278,13 +278,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   enemyType: 1
+  dec_patrolPointsHolder: {fileID: 0}
   dec_patrolPoints: []
-  eehit_attackSpeed: 0
-  eehit_chaseHitBox: {x: 0, y: 0, z: 0}
-  eehit_hitBoxSize: {x: 0, y: 0, z: 0}
+  dec_pointsState: 0
+  eehit_attackSpeed: 0.9
+  eehit_chaseHitBox: {x: 4, y: 1.13, z: 0}
+  eehit_hitBoxSize: {x: 1.36, y: 0.54, z: 0}
   eehit_groundAndPlayerMask:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 320
   eehit_chaseSpeedMultiplayer: 2
 --- !u!114 &524614685250456604
 MonoBehaviour:
