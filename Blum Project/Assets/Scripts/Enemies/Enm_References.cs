@@ -4,15 +4,20 @@ using UnityEngine;
 
 public class Enm_References : MonoBehaviour
 {
+    [Header("Components")]
     public Enm_Behaviour behaviour;
     public Enm_HealthSystem healthSystem;
 
     public Rigidbody2D rb;
     public CircleCollider2D collision;
+    [Header("Pivolts")]
     public Transform flip_Pivolt;
     public Transform grounded_Pivolt;
     public Transform attack_Pivolt;
+    public Transform center_Pivolt;
+    [Header("Animations")]
     public Animator anim;
+    private animations _curPlayingAnimation;
     private void Awake()
     {
         _currentAnimationPriority = -1;
@@ -43,19 +48,28 @@ public class Enm_References : MonoBehaviour
         if (_currentAnimationPriority > _priority) return;
         _currentAnimationPriority = _priority;
         var animationToPlay = _animations_EnumToAnimation(_animationEnum);
+        _curPlayingAnimation = _animationEnum;
         anim.Play(animationToPlay);
 
     }
-    public void PlayAnimation(int _animationHash, int _priority)
+    public void PlayAnimation(animations _animationEnum, int _priority, out bool canPlayThis)
     {
+        canPlayThis = false;
         if (_currentAnimationPriority > _priority) return;
         _currentAnimationPriority = _priority;
-        anim.Play(_animationHash);
+        var animationToPlay = _animations_EnumToAnimation(_animationEnum);
+        _curPlayingAnimation = _animationEnum;
+        canPlayThis = true;
+        anim.Play(animationToPlay);
 
     }
     public void ResetAnimationPriority()
     {
         _currentAnimationPriority = -1;
+    }
+    public animations GetCurrentPlayingAnimation()
+    {
+        return _curPlayingAnimation;
     }
     private int _animations_EnumToAnimation(animations _animationEnum)
     {

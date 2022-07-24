@@ -12,6 +12,8 @@ public class Main_GameManager : MonoBehaviour
     [SerializeField] private GameObject dropItemPrefab;
     
     private int coinCount;
+    public delegate void collectedItemDel(Item item, Vector3 position);
+    public event collectedItemDel OnCollectedItem;
 
     [System.Serializable]
     public class Item 
@@ -20,6 +22,8 @@ public class Main_GameManager : MonoBehaviour
         public int id;
         public Sprite sprite;
         public Player_Weapon weapon;
+        public AnimationClip animation;
+        public List<GameObject> spawnOnCollect = new List<GameObject>();
     }
     private void _SetupItems()
     {
@@ -45,7 +49,7 @@ public class Main_GameManager : MonoBehaviour
     {
         StartCoroutine(_spawnDropItem(GetItemFromName(name), position, count, dropTime));
     }
-    public void AddItemToInventory(int id)
+    public void AddItemToInventory(int id,Vector3 position)
     {
 
         if(id == 0)
@@ -55,6 +59,34 @@ public class Main_GameManager : MonoBehaviour
             Main_UiController.instance.coinCountText.SetText(GetCoinText());
         }
         var item = items[id];
+        OnCollectedItem?.Invoke(item,position);
+        foreach (var itemspawn in item.spawnOnCollect)
+        {
+            Instantiate(itemspawn, position, Quaternion.identity);
+        }
+        //Debug.Log(item.name);
+        if (item.weapon != null)
+        {
+            //add weapon to player
+            Player_References.instance.attack.weapon = item.weapon;
+            Debug.Log("Changed weapon");
+        }
+    }
+    public void AddItemToInventory(int id)
+    {
+
+        if (id == 0)
+        {
+            //coin
+            coinCount++;
+            Main_UiController.instance.coinCountText.SetText(GetCoinText());
+        }
+        var item = items[id];
+        OnCollectedItem?.Invoke(item, Vector3.zero);
+        foreach (var itemspawn in item.spawnOnCollect)
+        {
+            Instantiate(itemspawn, Vector3.zero, Quaternion.identity);
+        }
         //Debug.Log(item.name);
         if (item.weapon != null)
         {
@@ -71,6 +103,7 @@ public class Main_GameManager : MonoBehaviour
             var dropItemScript = spawnedDropItem.GetComponent<Items_DropItemPrefab>();
             dropItemScript.sprend.sprite = item.sprite;
             dropItemScript.itemID = item.id;
+            dropItemScript.SetAnimation(item);
             count--;
             if(dropTime > 0f)yield return new WaitForSeconds(dropTime / count);
         }

@@ -244,3 +244,4 @@ MonoBehaviour:
     m_NumAlphaKeys: 2
   editor_InPlayModePlayAnimationAgain: 0
   editor_ForceStayAlive: 0
+  velocityRandom_X_MinMax: {x: -0.001, y: 0.001}

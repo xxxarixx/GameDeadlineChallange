@@ -15,5 +15,5 @@ MonoBehaviour:
   hitDamage: 1
   attackSpeed: 1
   knockForce: 10
-  hitBoxSize: {x: 1.22, y: 0.61, z: 0}
+  hitBoxSize: {x: 1.22, y: 0.94, z: 0}
   otherCustomAnimation: {fileID: 7400000, guid: 52803e73cf051994ab2d37b39a4b6a2e, type: 2}

@@ -64,6 +64,7 @@ public class Enm_Patrol : MonoBehaviour
     private float _eehit_attackSpeedCooldown;
     private RaycastHit2D _eehit_shouldPerformAttack;
     private bool _eehit_attackAnimationEnded;
+    private bool _eehit_attackAnimationStarted;
 
     [Header("patrol Edge_Edge")]
     private float _ee_groundRaycastLength = 0.3f;
@@ -185,7 +186,7 @@ public class Enm_Patrol : MonoBehaviour
         _data.Move(_data.currentSpeed, Enm_Behaviour._MoveAxis.Horizontal);
         if (_ee_grounded)
         {
-            _data.refer.PlayAnimation(Enm_References.animations.walk, 1);
+            _data.refer.PlayAnimation(Enm_References.animations.walk, 0);
             _data._SetCurrentMoveSpeed(Enm_Behaviour.SpeedType.Ground);
         }
         else
@@ -218,22 +219,45 @@ public class Enm_Patrol : MonoBehaviour
         {
             if (_eehit_shouldPerformAttack.collider == null || _eehit_shouldPerformAttack.collider != null && _eehit_shouldPerformAttack.collider.gameObject.CompareTag("Player"))
             {
+                //_data.refer.rb.velocity = new Vector2(0f, _data.refer.rb.velocity.y);
                 _data.SetForceStopMovement(true);
                 if (_eehit_attackSpeedCooldown <= 0f)
                 {
                     // stop and can attack
                     _eehit_attackAnimationEnded = false;
-                    _data.refer.PlayAnimation(Enm_References.animations.attack, 2);
+                    _data.refer.PlayAnimation(Enm_References.animations.attack, 2, out bool canPlayThisAnimation);
+                    if (!canPlayThisAnimation)
+                    {
+                        _data.SetForceStopMovement(false);
+                    }
+                    else
+                    {
+                        _eehit_attackAnimationStarted = true;
+                    }
                     _eehit_attackSpeedCooldown = 1f / eehit_attackSpeed;
                 }
+                else
+                {
+                    _eehit_attackAnimationEnded = true;
+                }
+            }
+            else
+            {
+
+                //if in previous frame attack should be performed attack and was applied force stop movement and in next frame player went from attack validate raycast then unlock movement
+                if (_data._stopMove && _eehit_attackAnimationEnded) _data.SetForceStopMovement(false);
             }
         }
         else
         {
+            if (_data._stopMove && _eehit_attackAnimationEnded) _data.SetForceStopMovement(false);
+        }
+       /* else
+        {
 
             //if in previous frame attack should be performed attack and was applied force stop movement and in next frame player went from attack validate raycast then unlock movement
             if (_data._stopMove && !_eehit_shouldPerformAttack && _eehit_attackAnimationEnded) _data.SetForceStopMovement(false);
-        }
+        }*/
         if (_eehit_attackSpeedCooldown > 0f)
         {
             _eehit_attackSpeedCooldown -= Time.deltaTime;
@@ -253,7 +277,7 @@ public class Enm_Patrol : MonoBehaviour
             if (canChaseRaycastHit.collider == null || canChaseRaycastHit.collider != null && canChaseRaycastHit.collider.gameObject.CompareTag("Player")) //if player hit first or nothing was hitted then chase player 
             {
                 _data._SetCurrentMoveSpeed(_eehit__speedChase);
-                _data.refer.PlayAnimation(Enm_References.animations.walk, 1);
+                _data.refer.PlayAnimation(Enm_References.animations.walk, 0);
                 _data.Move(_data.currentSpeed, Enm_Behaviour._MoveAxis.Horizontal);
                 _isChasing = true;
             }
@@ -273,6 +297,7 @@ public class Enm_Patrol : MonoBehaviour
         _data.refer.ResetAnimationPriority();
         _data.SetForceStopMovement(false);
         _eehit_attackAnimationEnded = true;
+        _eehit_attackAnimationStarted = false;
         Debug.Log("stabAnimationEnded");
     }
     public void AttackDealDamageFrame()

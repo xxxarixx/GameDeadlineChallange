@@ -20,7 +20,7 @@ public class Player_PickupItem : MonoBehaviour
         if (collision.CompareTag("DropItem"))
         {
             var dropItemPrefab = collision.GetComponent<Items_DropItemPrefab>();
-            Main_GameManager.instance.AddItemToInventory(dropItemPrefab.itemID);
+            Main_GameManager.instance.AddItemToInventory(dropItemPrefab.itemID, collision.transform.position);
             Destroy(dropItemPrefab.gameObject);
         }
     }

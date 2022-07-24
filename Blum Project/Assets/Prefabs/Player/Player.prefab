@@ -1,5 +1,35 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!1 &2432617269317475231
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1792277189710477139}
+  m_Layer: 8
+  m_Name: plr_centerPivolt
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1792277189710477139
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2432617269317475231}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0.5, y: 0.75, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 7485639862947088912}
+  m_RootOrder: 1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &7485639861493490967
 GameObject:
   m_ObjectHideFlags: 0
@@ -210,6 +240,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 7485639863113711213}
+  - {fileID: 1792277189710477139}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -232,12 +263,15 @@ MonoBehaviour:
   rb: {fileID: 7485639862947088914}
   collision: {fileID: 7485639862947088913}
   mainSprend: {fileID: 7485639861493491049}
-  flip_Pivolt: {fileID: 7485639863113711213}
-  attack_Pivolt: {fileID: 7485639861609837688}
   anim: {fileID: 7485639861493491050}
-  fullHealthContainerPrefab: {fileID: 8926545824127414436, guid: 6d7058199d54c084b8095f85034c13e3, type: 3}
+  attack_Pivolt: {fileID: 7485639861609837688}
+  flip_Pivolt: {fileID: 7485639863113711213}
+  center_Pivolt: {fileID: 1792277189710477139}
   fullHealthSprite: {fileID: 21300000, guid: ba5696f589783134eb13edae77070958, type: 3}
   emptyHealthSprite: {fileID: 21300000, guid: 8e94700a3eb058a4ca2a33b08fb1ddd3, type: 3}
+  fullHealthContainerPrefab: {fileID: 8926545824127414436, guid: 6d7058199d54c084b8095f85034c13e3, type: 3}
+  dealDamageEffectPrefab: {fileID: 6708930576485984888, guid: 14e19932a1c736543a04e8f6cbe684a2, type: 3}
+  jumpEffectPrefab: {fileID: 829712216099369810, guid: 20630880fb9afb14eb093d2aeec50d65, type: 3}
   walkAnimation: {fileID: 7400000, guid: 26f03d9aadf71734ca3279b26814eca4, type: 2}
   idleAnimation: {fileID: 7400000, guid: 5218fd8facb96244a80b28684706e91b, type: 2}
   jumpAnimation: {fileID: 7400000, guid: 595d30048618dcc4cb17aa9c32f90989, type: 2}

@@ -11,17 +11,19 @@ public class Ui_DamagePopup : MonoBehaviour
     [Header("Other")]
     [SerializeField] private bool editor_InPlayModePlayAnimationAgain;
     [SerializeField] private bool editor_ForceStayAlive = false;
+    [SerializeField] private Vector2 velocityRandom_X_MinMax;
     private RectTransform _rectTransform;
     private TextMeshProUGUI textMesh;
     private float _progress;
     private float _timeToFinish;
     private Vector2 _editor_StartingPosition;
+    private float _choosedXVelocity;
     
     private void Start()
     {
         _SetupVeriables();
         _editor_StartingPosition = _rectTransform.position;
-
+        _choosedXVelocity = Random.Range(velocityRandom_X_MinMax.x, velocityRandom_X_MinMax.y);
     }
     private void Update()
     {
@@ -36,7 +38,7 @@ public class Ui_DamagePopup : MonoBehaviour
             var scale = scale_OverTime.Evaluate(_progress);
             var velocity = velocity_Y_OverTime.Evaluate(_progress);
             _rectTransform.localScale = new Vector3(scale, scale, scale);
-            _rectTransform.Translate(new Vector3(0f, velocity, 0f), Space.World);
+            _rectTransform.Translate(new Vector3(_choosedXVelocity, velocity, 0f), Space.World);
             textMesh.color = color_OverTime.Evaluate(_progress);
         }
         else

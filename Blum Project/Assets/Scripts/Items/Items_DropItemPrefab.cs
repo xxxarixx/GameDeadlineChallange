@@ -5,12 +5,21 @@ using UnityEngine;
 public class Items_DropItemPrefab : MonoBehaviour
 {
     public SpriteRenderer sprend;
+    public Animator animator;
     public int itemID;
     private Rigidbody2D rb;
     [Tooltip("it will change position Y based on this curve value and time")]public AnimationCurve jumpAnimation;
     public Vector2 randomXForce_FromTo;
     private float animationProgress = 0f;
     float xForce = 0f;
+    public void SetAnimation(Main_GameManager.Item item)
+    {
+        if (item.animation == null) return;
+        AnimatorOverrideController overrideController = new AnimatorOverrideController(animator.runtimeAnimatorController);
+        var animationNameToChange = animator.GetCurrentAnimatorClipInfo(0)[0].clip.name;
+        animator.runtimeAnimatorController = overrideController;
+        overrideController[animationNameToChange] = item.animation;
+    }
     private void Start()
     {
         rb = GetComponent<Rigidbody2D>();

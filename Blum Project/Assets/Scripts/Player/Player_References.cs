@@ -5,6 +5,7 @@ using UnityEngine;
 public class Player_References : MonoBehaviour
 {
     public static Player_References instance { get; private set; }
+    [Header("Components")]
     public Player_Input input;
     public Player_Movement movement;
     public Player_Attack attack;
@@ -12,12 +13,18 @@ public class Player_References : MonoBehaviour
     public Rigidbody2D rb;
     public CircleCollider2D collision;
     public SpriteRenderer mainSprend;
-    public Transform flip_Pivolt;
-    public Transform attack_Pivolt;
     public Animator anim;
-    public GameObject fullHealthContainerPrefab;
+    [Header("Pivolts")]
+    public Transform attack_Pivolt;
+    public Transform flip_Pivolt;
+    public Transform center_Pivolt;
+    [Header("Sprites")]
     public Sprite fullHealthSprite;
     public Sprite emptyHealthSprite;
+    [Header("Prefabs")]
+    public GameObject fullHealthContainerPrefab;
+    public GameObject dealDamageEffectPrefab;
+    public GameObject jumpEffectPrefab;
     private void Awake()
     {
         instance = this;
@@ -43,14 +50,32 @@ public class Player_References : MonoBehaviour
     [SerializeField] private AnimationClip fallingAnimation;
     private int _attackAnimationHash { get { return Animator.StringToHash(attackAnimation.name); } set { } }
     [SerializeField] private AnimationClip attackAnimation;
-
     public void PlayAnimation(animations animationEnum, int Priority)
     {
         if (_currentAnimationPriority > Priority) return;
         _currentAnimationPriority = Priority;
         var animationToPlay = _animations_EnumToAnimation(animationEnum);
         anim.Play(animationToPlay);
+
+    }
+    public void PlayAnimation(animations animationEnum, int Priority, out bool canPlayAnimation)
+    {
+        canPlayAnimation = false;
+        if (_currentAnimationPriority > Priority) return;
+        _currentAnimationPriority = Priority;
+        var animationToPlay = _animations_EnumToAnimation(animationEnum);
+        canPlayAnimation = true;
+        anim.Play(animationToPlay);
         
+    }
+    public void PlayAnimation(int animationHash, int Priority, out bool canPlayAnimation)
+    {
+        canPlayAnimation = false;
+        if (_currentAnimationPriority > Priority) return;
+        _currentAnimationPriority = Priority;
+        canPlayAnimation = true;
+        anim.Play(animationHash);
+
     }
     public void PlayAnimation(int animationHash, int Priority)
     {

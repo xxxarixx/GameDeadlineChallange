@@ -42,8 +42,8 @@ public class Enm_HealthSystem : MonoBehaviour, IDamagableByPlayer
     }
     private IEnumerator KnockFromDirection(Vector3 _knockDirection, float _weaponKnockForce)
     {
-        refer.PlayAnimation(Enm_References.animations.hurt, 0);
         refer.behaviour.SetForceStopMovement(true);
+        refer.PlayAnimation(Enm_References.animations.hurt, 0);
         refer.rb.velocity = new Vector2(_knockDirection.x, refer.rb.velocity.y) * (knockMultiplayer * _weaponKnockForce);
         yield return new WaitForSeconds(.125f);
         refer.behaviour.SetForceStopMovement(false);

@@ -42,15 +42,20 @@ public class Player_Attack : MonoBehaviour
         if (_isAttacking) return;
         if (_attackTime > 0f) return;
         _isAttacking = true;
+        bool canPlayAnimation = false;
         if(weapon.otherCustomAnimation != null) 
         {
-            refer.PlayAnimation(weapon.customAnimationHash, 1);
+            refer.PlayAnimation(weapon.customAnimationHash, 1,out canPlayAnimation);
         }
         else
         {
-            refer.PlayAnimation(Player_References.animations.attack, 1);
+            refer.PlayAnimation(Player_References.animations.attack, 1, out canPlayAnimation);
         }
-        refer.movement.SetMoveState(false);  
+        if (canPlayAnimation) 
+        {
+            refer.movement.SetMoveState(false);
+            refer.movement.StopJump();
+        }   
     }
     public void AnimationEnded()
     {
@@ -73,6 +78,14 @@ public class Player_Attack : MonoBehaviour
             {
                 damagable.OnHit(weapon.hitDamage, transform.GetInstanceID(), refer.attack_Pivolt.position, weapon.knockForce);
                 _objectsHitted.Add(damagable);
+                if(hit.TryGetComponent(out Enm_References enm_refer))
+                {
+                    Instantiate(refer.dealDamageEffectPrefab, enm_refer.center_Pivolt.position, Quaternion.identity);
+                }
+                else
+                {
+                    Instantiate(refer.dealDamageEffectPrefab, hit.transform.position, Quaternion.identity);
+                }
             }
         }
     }

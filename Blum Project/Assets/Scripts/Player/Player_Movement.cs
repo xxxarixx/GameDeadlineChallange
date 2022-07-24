@@ -9,7 +9,7 @@ public class Player_Movement : MonoBehaviour
     [Header("Movement")]
     [SerializeField] private float speedOnGround = 500f;
     [SerializeField] private float speedInAir = 250f;
-    private Vector2 _lastVelocityBeforeStop;
+    private float _lastMoveInputXBeforeStop;
     private bool _canMove = true;
     private enum _MoveAxis
     {
@@ -84,6 +84,7 @@ public class Player_Movement : MonoBehaviour
             if (grounded)
             {
                 _jumpStartedOnce = true;
+                //_isPerformingJump = false;
                 _coyoteTimeUsed = false;
                 _coyoteTimeEnded = false;
                 StopCoroutine(_CoyoteTimeCountDown());
@@ -102,7 +103,7 @@ public class Player_Movement : MonoBehaviour
         else _jumpDurationProcess = .2f;
         if (!_canMove) return;
         _isPerformingJump = (grounded) ? true : false;
-        
+        if (_isPerformingJump) Instantiate(refer.jumpEffectPrefab, refer.flip_Pivolt.position, Quaternion.identity);
     }
     private void _Input_OnJumpCancelled()
     {
@@ -150,7 +151,7 @@ public class Player_Movement : MonoBehaviour
     }
     private void _Movement_horizontal()
     {
-        _lastVelocityBeforeStop = (refer.input.moveInput != Vector2.zero) ? refer.input.moveInput : _lastVelocityBeforeStop;
+        _lastMoveInputXBeforeStop = (refer.input.moveInput.x != 0f) ? refer.input.moveInput.x : _lastMoveInputXBeforeStop;
         if (!_canMove) return;
         _Move(speed_current, _MoveAxis.Horizontal);
         _FlipBasedOnVelocity();
@@ -201,7 +202,7 @@ public class Player_Movement : MonoBehaviour
     }
     private void _FlipBasedOnVelocity()
     {
-        var moveDir = (refer.rb.velocity.x == 0)? _lastVelocityBeforeStop.x : refer.rb.velocity.x;
+        var moveDir = (refer.rb.velocity.x == 0)? _lastMoveInputXBeforeStop : refer.rb.velocity.x;
         refer.flip_Pivolt.localScale = new Vector3((moveDir > 0f) ? Mathf.Abs(refer.flip_Pivolt.localScale.x) : -Mathf.Abs(refer.flip_Pivolt.localScale.x), refer.flip_Pivolt.localScale.y, refer.flip_Pivolt.localScale.z);
     }
     #endregion
@@ -220,6 +221,12 @@ public class Player_Movement : MonoBehaviour
     public void StopPlayerMove(Vector2 offsetVelocity)
     {
         refer.rb.velocity = Vector2.zero + offsetVelocity;
+    }
+    public void StopJump()
+    {
+        if (!_isPerformingJump) return;
+        //_jumpReachedEnd = true;
+        _Jump_Reset();
     }
     #endregion
 }

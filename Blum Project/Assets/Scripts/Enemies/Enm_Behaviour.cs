@@ -23,7 +23,7 @@ public class Enm_Behaviour : MonoBehaviour
     /// <summary>
     /// to change use: SetForceStopMovement();
     /// </summary>
-    [HideInInspector] public bool _stopMove { get; private set; }
+    public bool _stopMove;
     private void Awake()
     {
         _SpeedSetup();

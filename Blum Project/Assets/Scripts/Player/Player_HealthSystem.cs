@@ -60,6 +60,7 @@ public class Player_HealthSystem : MonoBehaviour,IDamagableByEnemy
 
     void Update()
     {
+        if (isDead()) refer.rb.velocity = Vector2.zero;
         if (invicibilityProcess > 0f)
         {
             invicibilityProcess -= Time.deltaTime;
@@ -169,6 +170,7 @@ public class Player_HealthSystem : MonoBehaviour,IDamagableByEnemy
         if (!isDead()) return;
         refer.movement.SetMoveState(false);
         Main_UiController.instance.deadScreen.SetActive(true);
+        refer.rb.velocity = new Vector2(0f, 0f);
         refer.PlayAnimation(Player_References.animations.idle, 10);
         refer.rb.gravityScale = 0;
         refer.collision.enabled = false;
