@@ -351,7 +351,7 @@ public class Enm_Patrol : MonoBehaviour
             }
         }
         //is near next point
-        if (Vector3.Distance(_data.refer.flip_Pivolt.position, dec_patrolPoints[_dec_currentPoint].pointTransform.position) < .2f )
+        if (Vector3.Distance(_data.refer.flip_Pivolt.position, dec_patrolPoints[_dec_currentPoint].pointTransform.position) < .4f )
         {
             //reached destination
             dec_patrolPoints[_dec_currentPoint].onReachedPatrolPoint?.Invoke();
@@ -385,7 +385,7 @@ public class Enm_Patrol : MonoBehaviour
         else
         {
             //move and rotate torward destination if isnt close enough
-            if (pointDistanceX > .02f)
+            if (pointDistanceX > .1f)
             {
                 _data.FaceTarget(moveDir);
                 _data.Move(_data.currentSpeed, Enm_Behaviour._MoveAxis.Horizontal);
