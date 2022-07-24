@@ -176,7 +176,7 @@ public class Enm_Patrol : MonoBehaviour
     #region Patrol Edge_Edge
     private void _PatrolMovement()
     {
-        if (_data._stopMove) return;
+        if (_data._stopMove ||enemyType == EnemyType.Patrol_Edge_Edge_WHitBoxChase && _eehit_attackAnimationStarted && !_eehit_attackAnimationEnded) return;
         _ee_groundedPatrolDireciton = _HittingGroundedPatrolDireciton_Raycast();
         _ee_grounded = _HittingGrounded_Raycast();
         if (!_ee_groundedPatrolDireciton && _ee_grounded || _HittingInFront_Raycast() && _ee_grounded)
@@ -217,47 +217,34 @@ public class Enm_Patrol : MonoBehaviour
         _eehit_shouldPerformAttack = _HittingAttackValidate_Raycast();
         if (attackHitBox != null)
         {
-            if (_eehit_shouldPerformAttack.collider == null || _eehit_shouldPerformAttack.collider != null && _eehit_shouldPerformAttack.collider.gameObject.CompareTag("Player"))
+            if (_eehit_shouldPerformAttack.collider != null && _eehit_shouldPerformAttack.collider.gameObject.CompareTag("Player") || _eehit_shouldPerformAttack.collider == null)
             {
                 //_data.refer.rb.velocity = new Vector2(0f, _data.refer.rb.velocity.y);
                 _data.SetForceStopMovement(true);
                 if (_eehit_attackSpeedCooldown <= 0f)
                 {
                     // stop and can attack
-                    _eehit_attackAnimationEnded = false;
                     _data.refer.PlayAnimation(Enm_References.animations.attack, 2, out bool canPlayThisAnimation);
+                   
                     if (!canPlayThisAnimation)
                     {
                         _data.SetForceStopMovement(false);
                     }
                     else
                     {
+                        _eehit_attackAnimationEnded = false;
                         _eehit_attackAnimationStarted = true;
+                        _data.SetForceStopMovement(true);
+                        _data.refer.rb.velocity = new Vector2(0f, _data.refer.rb.velocity.y);
+                        _eehit_attackSpeedCooldown = 1f / eehit_attackSpeed;
                     }
-                    _eehit_attackSpeedCooldown = 1f / eehit_attackSpeed;
                 }
-                else
-                {
-                    _eehit_attackAnimationEnded = true;
-                }
-            }
-            else
-            {
-
-                //if in previous frame attack should be performed attack and was applied force stop movement and in next frame player went from attack validate raycast then unlock movement
-                if (_data._stopMove && _eehit_attackAnimationEnded) _data.SetForceStopMovement(false);
             }
         }
         else
         {
-            if (_data._stopMove && _eehit_attackAnimationEnded) _data.SetForceStopMovement(false);
+            if (_data._stopMove && !_eehit_attackAnimationStarted && _eehit_attackAnimationEnded && _eehit_attackSpeedCooldown > 0f) _data.SetForceStopMovement(false);
         }
-       /* else
-        {
-
-            //if in previous frame attack should be performed attack and was applied force stop movement and in next frame player went from attack validate raycast then unlock movement
-            if (_data._stopMove && !_eehit_shouldPerformAttack && _eehit_attackAnimationEnded) _data.SetForceStopMovement(false);
-        }*/
         if (_eehit_attackSpeedCooldown > 0f)
         {
             _eehit_attackSpeedCooldown -= Time.deltaTime;

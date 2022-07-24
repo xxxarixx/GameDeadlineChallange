@@ -129,11 +129,11 @@ public class Main_GameManager : MonoBehaviour
         {
             return $"00{coinCount}";
         }
-        else if(coinCount > 10)
+        else if(coinCount >= 10)
         {
             return $"0{coinCount}";
         }
-        else if(coinCount > 100)
+        else if(coinCount >= 100)
         {
             return $"{coinCount}";
         }
