@@ -75,7 +75,7 @@ public class Player_HealthSystem : MonoBehaviour,IDamagableByEnemy
         if (time > 0f) OnInvicibilityStarted?.Invoke();
         invicibilityProcess = time;
     }
-    private void _AddHeartContainers(int HeartContainerCount, bool full = true)
+    public void _AddHeartContainers(int HeartContainerCount, bool full = true)
     {
         for (int i = 0; i < HeartContainerCount; i++)
         {
@@ -86,8 +86,19 @@ public class Player_HealthSystem : MonoBehaviour,IDamagableByEnemy
             if (full) Heal(1);
         }
     }
+    public void _AddHeartContainers(int HeartContainerCount)
+    {
+        for (int i = 0; i < HeartContainerCount; i++)
+        {
+            if (healthContainers.Count >= maxHealth) return;
+            var spawnedContainer = Instantiate(refer.fullHealthContainerPrefab, Main_UiController.instance.healthContainerHolder.transform);
+            healthContainers.Add(new HealthContainer(spawnedContainer.GetComponent<Image>(), true));
+            _SetContainerState(healthContainers[healthContainers.Count - 1], true);
+             Heal(1);
+        }
+    }
 
-    private void _RemoveHeartContainers(int HeartContainerCount)
+    public void _RemoveHeartContainers(int HeartContainerCount)
     {
         for (int i = healthContainers.Count - 1; i >= 0; i--)
         {
@@ -108,6 +119,10 @@ public class Player_HealthSystem : MonoBehaviour,IDamagableByEnemy
         _UpdateHeartContainer(_damage);
         _knockbackPlayer(_invokerPosition, _knockbackMultiplayer);
         _CheckForPlayerDeath();
+    }
+    public void Hit(int _damage)
+    {
+        OnHit(_damage, refer.flip_Pivolt.position, 1f);
     }
     private void _knockbackPlayer(Vector3 _invokerPosition, float _knockBackMultiplayer)
     {

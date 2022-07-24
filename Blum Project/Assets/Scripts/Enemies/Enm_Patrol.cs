@@ -33,9 +33,10 @@ public class Enm_Patrol : MonoBehaviour
     [System.Serializable]
     public class PatrolPoint 
     {
-        public string PointName = "Point";
+        public string pointName = "Point";
         public Transform pointTransform;
-        public UnityEvent onReachedPatrolPoint; 
+        public UnityEvent onReachedPatrolPoint;
+        [Tooltip("value <= 0 = automatic || value>0 = custom: means from previous point to this point if there will be jump then set jump force to this value")]public float manualJumpForce = -1f;
         public PatrolPoint (Transform pointTransform)
         {
             this.pointTransform = pointTransform;
@@ -272,6 +273,7 @@ public class Enm_Patrol : MonoBehaviour
         _data.refer.ResetAnimationPriority();
         _data.SetForceStopMovement(false);
         _eehit_attackAnimationEnded = true;
+        Debug.Log("stabAnimationEnded");
     }
     public void AttackDealDamageFrame()
     {
@@ -349,7 +351,7 @@ public class Enm_Patrol : MonoBehaviour
             }
         }
         //is near next point
-        if (Vector3.Distance(_data.refer.flip_Pivolt.position, dec_patrolPoints[_dec_currentPoint].pointTransform.position) < .4f )
+        if (Vector3.Distance(_data.refer.flip_Pivolt.position, dec_patrolPoints[_dec_currentPoint].pointTransform.position) < .2f )
         {
             //reached destination
             dec_patrolPoints[_dec_currentPoint].onReachedPatrolPoint?.Invoke();
@@ -358,25 +360,44 @@ public class Enm_Patrol : MonoBehaviour
         
         var moveDir = (dec_patrolPoints[_dec_currentPoint].pointTransform.position - _data.refer.flip_Pivolt.position).normalized;
         var frontHit = Physics2D.Raycast(_data.refer.grounded_Pivolt.position, _data._FrontDirectiong(), .75f, _data.groundMask);
-        bool pointIsHeigher = (dec_patrolPoints[_dec_currentPoint].pointTransform.position.y - _data.refer.flip_Pivolt.position.y) > .2f;
-        float pointDistanceX = Mathf.Abs(_data.refer.flip_Pivolt.position.x - dec_patrolPoints[_dec_currentPoint].pointTransform.position.x);
-        //automatic jump based on point height
-        if ((frontHit || !frontHit && !_HittingGroundedPatrolDireciton_Raycast()) && pointIsHeigher && _HittingGrounded_Raycast() && _dec_jumpDelay <= 0f)
+        bool pointIsHeigher(float heiherValue)
         {
-            _data.Move(Mathf.Abs(_data.refer.flip_Pivolt.position.y - dec_patrolPoints[_dec_currentPoint].pointTransform.position.y) * 205f, Enm_Behaviour._MoveAxis.Vertical);
+            return (dec_patrolPoints[_dec_currentPoint].pointTransform.position.y - _data.refer.flip_Pivolt.position.y) > .2f;
+        }
+        float pointDistanceX = Mathf.Abs(_data.refer.flip_Pivolt.position.x - dec_patrolPoints[_dec_currentPoint].pointTransform.position.x);
+        bool closeToTargetOnX = pointDistanceX < 1f;
+        bool isinFlatSurfaceAndPointIsHigh = !frontHit && closeToTargetOnX && pointIsHeigher(0.5f);
+        bool thereIsGapBetweenGrounds = !frontHit && !_HittingGroundedPatrolDireciton_Raycast();
+        //automatic jump based on point height
+        if ((frontHit || thereIsGapBetweenGrounds || isinFlatSurfaceAndPointIsHigh) && pointIsHeigher(0.2f) && _HittingGrounded_Raycast() && _dec_jumpDelay <= 0f)
+        {
+            Debug.Log(Mathf.Abs(_data.refer.flip_Pivolt.position.y - dec_patrolPoints[_dec_currentPoint].pointTransform.position.y));
+            float jumpforce = (dec_patrolPoints[_dec_currentPoint].manualJumpForce > 0f)?dec_patrolPoints[_dec_currentPoint].manualJumpForce : 95f + Mathf.Abs(_data.refer.flip_Pivolt.position.y - dec_patrolPoints[_dec_currentPoint].pointTransform.position.y) * 150f;
+            _data.Move(jumpforce, Enm_Behaviour._MoveAxis.Vertical);
             _dec_jumpDelay = 0.75f;
         }
-        //move and rotate torward destination if isnt close enough
-        if(pointDistanceX > .1f)
+        bool waitForJump = closeToTargetOnX && pointIsHeigher(0.5f) && _data.refer.rb.velocity.y <= 0f;
+        if (waitForJump)
         {
-            _data.FaceTarget(moveDir);
-            _data.Move(_data.currentSpeed, Enm_Behaviour._MoveAxis.Horizontal);
+            _dec_jumpDelay = 0f;
+            _data.refer.rb.velocity = new Vector2(0f, _data.refer.rb.velocity.y);
         }
         else
         {
-            //just let enemy fall if is too close on X axis
-            _data.refer.rb.velocity = new Vector2(0f,_data.refer.rb.velocity.y);
+            //move and rotate torward destination if isnt close enough
+            if (pointDistanceX > .02f)
+            {
+                _data.FaceTarget(moveDir);
+                _data.Move(_data.currentSpeed, Enm_Behaviour._MoveAxis.Horizontal);
+            }
+            else
+            {
+                //just let enemy fall if is too close on X axis
+                _data.refer.rb.velocity = new Vector2(0f,_data.refer.rb.velocity.y);
+            }
+            
         }
+
 
         _data.refer.PlayAnimation(Enm_References.animations.walk, 0);
         if (_dec_jumpDelay > 0f)
@@ -505,7 +526,7 @@ public class Enm_Patrol : MonoBehaviour
     }
     private string _GetPointName(int currentPoint)
     {
-        return (dec_patrolPoints[currentPoint].PointName != string.Empty) ? dec_patrolPoints[currentPoint].PointName : $"Point{currentPoint}";
+        return (dec_patrolPoints[currentPoint].pointName != string.Empty) ? dec_patrolPoints[currentPoint].pointName : $"Point{currentPoint}";
     }
     private void _PatrolDeceleratedPointsEditorUpdateRemoveAndAdd()
     {
@@ -689,7 +710,8 @@ public class Enm_Patrol_Editor : Editor
                 CustomEditorAssistance_._DrawProperty(serializedObject, nameof(_Patrol._dec_activePathVisualizesion));
                 if (_Patrol._data.refer.healthSystem.knockMultiplayer > 0f)CustomEditorAssistance_._DrawProperty(serializedObject, nameof(_Patrol._dec_checkForKnockOutOfPatrol_UpdateRate));
                 if(_Patrol._data.refer.healthSystem.knockMultiplayer > 0f)CustomEditorAssistance_._DrawText($"tip1: enemy knock back multiplayer is heigher then 0 so you should set patrol point after every obstacle to avoid complications ", Color.yellow, 13, true);
-                CustomEditorAssistance_._DrawText($"tip2: if point transfrom was removed then it will automatically repaint when pressed on object that holding this script, so dont worry :)", Color.gray, 13, true);
+                CustomEditorAssistance_._DrawText($"tip2: if enemy randomly between points jump try lower points Y position", Color.gray, 13, true);
+                CustomEditorAssistance_._DrawText($"tip3: if point transfrom was removed then it will automatically repaint when pressed on object that holding this script, so dont worry :)", Color.gray, 13, true);
                 //CustomEditorAssistance_._DrawProperty(serializedObject, nameof(_Patrol._dec_lastSavedPatrolPointsTransfroms));
                 break;
             default:
