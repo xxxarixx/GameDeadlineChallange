@@ -1,7 +1,9 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
+/// <summary>
+/// it is centerlizesion of all player references and animations in one easy accesable place
+/// </summary>
 public class Player_References : MonoBehaviour
 {
     public static Player_References instance { get; private set; }
@@ -50,47 +52,47 @@ public class Player_References : MonoBehaviour
     [SerializeField] private AnimationClip fallingAnimation;
     private int _attackAnimationHash { get { return Animator.StringToHash(attackAnimation.name); } set { } }
     [SerializeField] private AnimationClip attackAnimation;
-    public void PlayAnimation(animations animationEnum, int Priority)
+    public void PlayAnimation(animations _animationEnum, int _priority)
     {
-        if (_currentAnimationPriority > Priority) return;
-        _currentAnimationPriority = Priority;
-        var animationToPlay = _animations_EnumToAnimation(animationEnum);
+        if (_currentAnimationPriority > _priority) return;
+        _currentAnimationPriority = _priority;
+        var animationToPlay = _animations_EnumToAnimation(_animationEnum);
         anim.Play(animationToPlay);
 
     }
-    public void PlayAnimation(animations animationEnum, int Priority, out bool canPlayAnimation)
+    public void PlayAnimation(animations _animationEnum, int _priority, out bool _canPlayAnimation)
     {
-        canPlayAnimation = false;
-        if (_currentAnimationPriority > Priority) return;
-        _currentAnimationPriority = Priority;
-        var animationToPlay = _animations_EnumToAnimation(animationEnum);
-        canPlayAnimation = true;
+        _canPlayAnimation = false;
+        if (_currentAnimationPriority > _priority) return;
+        _currentAnimationPriority = _priority;
+        var animationToPlay = _animations_EnumToAnimation(_animationEnum);
+        _canPlayAnimation = true;
         anim.Play(animationToPlay);
         
     }
-    public void PlayAnimation(int animationHash, int Priority, out bool canPlayAnimation)
+    public void PlayAnimation(int _animationHash, int _priority, out bool _canPlayAnimation)
     {
-        canPlayAnimation = false;
-        if (_currentAnimationPriority > Priority) return;
-        _currentAnimationPriority = Priority;
-        canPlayAnimation = true;
-        anim.Play(animationHash);
+        _canPlayAnimation = false;
+        if (_currentAnimationPriority > _priority) return;
+        _currentAnimationPriority = _priority;
+        _canPlayAnimation = true;
+        anim.Play(_animationHash);
 
     }
-    public void PlayAnimation(int animationHash, int Priority)
+    public void PlayAnimation(int _animationHash, int _priority)
     {
-        if (_currentAnimationPriority > Priority) return;
-        _currentAnimationPriority = Priority;
-        anim.Play(animationHash);
+        if (_currentAnimationPriority > _priority) return;
+        _currentAnimationPriority = _priority;
+        anim.Play(_animationHash);
 
     }
     public void ResetAnimationPriority()
     {
         _currentAnimationPriority = -1;
     }
-    private int _animations_EnumToAnimation(animations animationEnum)
+    private int _animations_EnumToAnimation(animations _animationEnum)
     {
-        switch (animationEnum)
+        switch (_animationEnum)
         {
             case animations.walk:
                 return _walkAnimationHash;

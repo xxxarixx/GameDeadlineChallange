@@ -19,7 +19,9 @@ public class Main_CameraController : MonoBehaviour
     }
     private void FixedUpdate()
     {
+        //camera movement tilt torward player velocity dependly on independent smoothness
         Vector3 finalPosition = target.position + offset + Vector3.Lerp(lastAppliedVelocity,appliedVelocityOffset, smothnessVelocityCamera * Time.deltaTime);
+        //camera movement process dependly on independent smoothness
         _SetCameraPosition(Vector3.Lerp(mainCam.transform.position, finalPosition, smothnessOverallCamera * Time.deltaTime));
         lastAppliedVelocity = appliedVelocityOffset;
     }

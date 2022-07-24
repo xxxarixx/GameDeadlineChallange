@@ -15,9 +15,12 @@ public class Items_DropItemPrefab : MonoBehaviour
     public void SetAnimation(Main_GameManager.Item item)
     {
         if (item.animation == null) return;
+        //create new animator overrider
         AnimatorOverrideController overrideController = new AnimatorOverrideController(animator.runtimeAnimatorController);
+        //get sprite animation current playing
         var animationNameToChange = animator.GetCurrentAnimatorClipInfo(0)[0].clip.name;
         animator.runtimeAnimatorController = overrideController;
+        //change sprite animation to new one
         overrideController[animationNameToChange] = item.animation;
     }
     private void Start()
@@ -30,10 +33,10 @@ public class Items_DropItemPrefab : MonoBehaviour
         if (animationProgress > jumpAnimation.keys[jumpAnimation.length - 1].time)
         {
             //animation ended
-
         }
         else
         {
+            //animation jump processing
             animationProgress += Time.deltaTime;
             rb.velocity = new Vector2(xForce, jumpAnimation.Evaluate(animationProgress));
         }

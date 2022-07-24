@@ -1,7 +1,9 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
+/// <summary>
+/// play animation dependly on what item was picked it work independly without setting anything on item list
+/// </summary>
 public class items_CollectedItemPlayAnimation : MonoBehaviour
 {
     public Main_GameManager gameManager;

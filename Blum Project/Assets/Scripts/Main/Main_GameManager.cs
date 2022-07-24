@@ -3,10 +3,13 @@ using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 using System.Linq;
+/// <summary>
+/// game centrelizesion it hold some key references and hold item list
+/// </summary>
 public class Main_GameManager : MonoBehaviour
 {
     public static Main_GameManager instance;
-    [SerializeField] private GameObject ui_DamagePopup;
+    
     
     [SerializeField] private List<Item> items = new List<Item>();
     [SerializeField] private GameObject dropItemPrefab;
@@ -51,8 +54,8 @@ public class Main_GameManager : MonoBehaviour
     }
     public void AddItemToInventory(int id,Vector3 position)
     {
-
-        if(id == 0)
+        //if it is coin then automaticlly move to player pocket
+        if (id == 0)
         {
             //coin
             coinCount++;
@@ -74,7 +77,7 @@ public class Main_GameManager : MonoBehaviour
     }
     public void AddItemToInventory(int id)
     {
-
+        //if it is coin then automaticlly move to player pocket
         if (id == 0)
         {
             //coin
@@ -141,8 +144,9 @@ public class Main_GameManager : MonoBehaviour
     }
     public void SpawnDamagePopup(Vector3 _position, float _damageDealt)
     {
-        var spawnedDamagePopup = Instantiate(ui_DamagePopup, Main_UiController.instance.canvas_World.transform);
+        var spawnedDamagePopup = Instantiate(Main_UiController.instance.ui_DamagePopup, Main_UiController.instance.canvas_World.transform);
         float positionRandomRange = 0.3f;
+        //set damage popup small randomness to spawn position for better visual appeal
         spawnedDamagePopup.transform.position = _position + new Vector3(Random.Range(-positionRandomRange, positionRandomRange), Random.Range(-positionRandomRange, positionRandomRange), 0f);
         var damagePopupText = spawnedDamagePopup.GetComponent<TextMeshProUGUI>();
         damagePopupText.text = _damageDealt.ToString();

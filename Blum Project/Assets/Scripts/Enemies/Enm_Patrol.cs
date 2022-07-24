@@ -50,7 +50,6 @@ public class Enm_Patrol : MonoBehaviour
         reverse,
         loop
     }
-    private int _dec_lastPatrolPointsCount;
     [Header("patrol Edge_Edge WHitBoxChase")]
     public int eehit_damageToDeal = 1;
     public int eehit_knockbackToPlayerMultiplayer = 1;
@@ -176,9 +175,11 @@ public class Enm_Patrol : MonoBehaviour
     #region Patrol Edge_Edge
     private void _PatrolMovement()
     {
+        //return if stop movement or enemy with attack animation and chase is still playing attack animation
         if (_data._stopMove ||enemyType == EnemyType.Patrol_Edge_Edge_WHitBoxChase && _eehit_attackAnimationStarted && !_eehit_attackAnimationEnded) return;
         _ee_groundedPatrolDireciton = _HittingGroundedPatrolDireciton_Raycast();
         _ee_grounded = _HittingGrounded_Raycast();
+        //if raycast to the ground a little bit in front of enemy is not hitting ground and raycst directly in feets is hitting then flip enemy movement
         if (!_ee_groundedPatrolDireciton && _ee_grounded || _HittingInFront_Raycast() && _ee_grounded)
         {
             _data._Flip();
@@ -203,7 +204,7 @@ public class Enm_Patrol : MonoBehaviour
     private bool _HittingInFront_Raycast() => Physics2D.Raycast(_data.refer.grounded_Pivolt.position, _data._FrontDirectiong(), _ee_groundPatrolDirecitonRaycastLength, _data.groundMask);
     private void _Draw_Raycast_Grounded() => _data._Draw_Raycast(_data.refer.flip_Pivolt.position, Vector3.down, _ee_groundRaycastLength, Color.white);
     private void _Draw_Raycast_GroundedPatrolDireciton() => _data._Draw_Raycast(_data.refer.grounded_Pivolt.position, Vector3.down, _ee_groundPatrolDirecitonRaycastLength, Color.yellow);
-    private void _Draw_Raycast_InFront(float length) => _data._Draw_Raycast(_data.refer.grounded_Pivolt.position, _data._FrontDirectiong(), length, Color.green);
+    private void _Draw_Raycast_InFront(float _length) => _data._Draw_Raycast(_data.refer.grounded_Pivolt.position, _data._FrontDirectiong(), _length, Color.green);
     #endregion
 
     #region Patrol Edge_Edge W HitBox Chase
@@ -213,14 +214,18 @@ public class Enm_Patrol : MonoBehaviour
     }
     private void _AttackValidate()
     {
+
+        //hit box collision
         var attackHitBox = Physics2D.OverlapBox(_data.refer.attack_Pivolt.position + (_data.refer.flip_Pivolt.localScale.x * (eehit_hitBoxSize.x / 2) * Vector3.right), eehit_hitBoxSize, 0f, 1 << 8);
         _eehit_shouldPerformAttack = _HittingAttackValidate_Raycast();
         if (attackHitBox != null)
         {
+            //if raycast in front length of hitbox size is not hittng but hit is then still do attack animation
             if (_eehit_shouldPerformAttack.collider != null && _eehit_shouldPerformAttack.collider.gameObject.CompareTag("Player") || _eehit_shouldPerformAttack.collider == null)
             {
-                //_data.refer.rb.velocity = new Vector2(0f, _data.refer.rb.velocity.y);
+                //if player is in attack range of enemy then stop his movement
                 _data.SetForceStopMovement(true);
+                //perform attack animation
                 if (_eehit_attackSpeedCooldown <= 0f)
                 {
                     // stop and can attack
@@ -234,23 +239,24 @@ public class Enm_Patrol : MonoBehaviour
                     {
                         _eehit_attackAnimationEnded = false;
                         _eehit_attackAnimationStarted = true;
+                        _eehit_attackSpeedCooldown = 1f / eehit_attackSpeed;
+                        //additional checkment for stop kinda unnesesery but for safety reasons better to leave it 
                         _data.SetForceStopMovement(true);
                         _data.refer.rb.velocity = new Vector2(0f, _data.refer.rb.velocity.y);
-                        _eehit_attackSpeedCooldown = 1f / eehit_attackSpeed;
                     }
                 }
             }
         }
         else
         {
-            if (_data._stopMove && !_eehit_attackAnimationStarted && _eehit_attackAnimationEnded && _eehit_attackSpeedCooldown > 0f) _data.SetForceStopMovement(false);
+            //if player was stopped and attack animation was played then disable enemy stop
+            if (_data._stopMove && !_eehit_attackAnimationStarted && _eehit_attackAnimationEnded) _data.SetForceStopMovement(false);
         }
+        //process attack cooldown
         if (_eehit_attackSpeedCooldown > 0f)
         {
             _eehit_attackSpeedCooldown -= Time.deltaTime;
         }
-
-        //performing attack cooldown
     }
     private void _ChaseMovement(out bool _isChasing)
     {
@@ -259,7 +265,7 @@ public class Enm_Patrol : MonoBehaviour
         var chaseHitBoxHit = Physics2D.OverlapBox(_data.refer.flip_Pivolt.position + (_data.refer.flip_Pivolt.localScale.x * (eehit_chaseHitBox.x / 2) * Vector3.right) + (eehit_chaseHitBox.y / 2) * Vector3.up, eehit_chaseHitBox, 0f, 1 << 8);
         if (chaseHitBoxHit != null)
         {
-            //detect ground and player
+            //if player is in chase hit box and nothing is blocking enemy way to player or directly hitting player then chase! 
             var canChaseRaycastHit = Physics2D.Raycast(_data.refer.flip_Pivolt.position + (eehit_chaseHitBox.y / 2) * Vector3.up, _data._FrontDirectiong(), eehit_chaseHitBox.x, eehit_groundAndPlayerMask);
             if (canChaseRaycastHit.collider == null || canChaseRaycastHit.collider != null && canChaseRaycastHit.collider.gameObject.CompareTag("Player")) //if player hit first or nothing was hitted then chase player 
             {
@@ -318,6 +324,7 @@ public class Enm_Patrol : MonoBehaviour
     #region Patrol W decelerated Points
     private void _PatrolMovementWDeceleratedPoints()
     {
+        //if patrol points is less then 2 then just play idle animation
         if (dec_patrolPoints.Count == 0 || dec_patrolPoints.Count == 1)
         {
             _data.refer.PlayAnimation(Enm_References.animations.idle, 2);
@@ -331,10 +338,6 @@ public class Enm_Patrol : MonoBehaviour
             for (int i = 0; i < dec_patrolPoints.Count; i++)
             {
                 var curPatrolPoint = dec_patrolPoints[i];
-                //1.get distance between enemy and current patrol point
-                //2.get hit ground in this distance
-                //3.if hitted ground then check if distance from hit and patrol point is less then 0.5f can return to path but if not hitted then can return to path too
-                //4.if in point 3. distance is too high then change enemy state to patrol
                 var distance = Vector3.Distance(_data.refer.flip_Pivolt.position, curPatrolPoint.pointTransform.position);
                 var direction = (curPatrolPoint.pointTransform.position - _data.refer.flip_Pivolt.position).normalized;
                 var hittedGround = Physics2D.Raycast(_data.refer.flip_Pivolt.position, direction, distance, _data.groundMask);
@@ -346,6 +349,7 @@ public class Enm_Patrol : MonoBehaviour
             }
             return isNear;
         }
+        //process situasion where enemy is way knocked of his points and cant reach already
         if(_data.refer.healthSystem.knockMultiplayer > 0f)
         {
             if(_dec_kockOutOfPatrol_process <= 0f)
@@ -372,9 +376,9 @@ public class Enm_Patrol : MonoBehaviour
         
         var moveDir = (dec_patrolPoints[_dec_currentPoint].pointTransform.position - _data.refer.flip_Pivolt.position).normalized;
         var frontHit = Physics2D.Raycast(_data.refer.grounded_Pivolt.position, _data._FrontDirectiong(), .75f, _data.groundMask);
-        bool pointIsHeigher(float heiherValue)
+        bool pointIsHeigher(float _heightValue)
         {
-            return (dec_patrolPoints[_dec_currentPoint].pointTransform.position.y - _data.refer.flip_Pivolt.position.y) > .2f;
+            return (dec_patrolPoints[_dec_currentPoint].pointTransform.position.y - _data.refer.flip_Pivolt.position.y) > _heightValue;
         }
         float pointDistanceX = Mathf.Abs(_data.refer.flip_Pivolt.position.x - dec_patrolPoints[_dec_currentPoint].pointTransform.position.x);
         bool closeToTargetOnX = pointDistanceX < 1f;
@@ -388,6 +392,7 @@ public class Enm_Patrol : MonoBehaviour
             _data.Move(jumpforce, Enm_Behaviour._MoveAxis.Vertical);
             _dec_jumpDelay = 0.75f;
         }
+        //if point enemy is close on x axis and point is high on Y axis then reset jump cooldown
         bool waitForJump = closeToTargetOnX && pointIsHeigher(0.5f) && _data.refer.rb.velocity.y <= 0f;
         if (waitForJump)
         {
@@ -396,7 +401,7 @@ public class Enm_Patrol : MonoBehaviour
         }
         else
         {
-            //move and rotate torward destination if isnt close enough
+            //move and rotate torward destination if isnt close enough to avoid infinit flip between left and right side
             if (pointDistanceX > .1f)
             {
                 _data.FaceTarget(moveDir);
@@ -412,51 +417,52 @@ public class Enm_Patrol : MonoBehaviour
 
 
         _data.refer.PlayAnimation(Enm_References.animations.walk, 0);
+        //jump cooldown process
         if (_dec_jumpDelay > 0f)
         {
             _dec_jumpDelay -= Time.deltaTime;
         }
     }
-    private PatrolPoint _GetNextPoint(int currentPoint)
+    private PatrolPoint _GetNextPoint(int _currentPoint)
     {
         int nextPointIndex = 0;
         switch (dec_OnLastPointDo)
         {
             case PatrolPointsState.reverse:
-                if (currentPoint + 1 >= dec_patrolPoints.Count)
+                if (_currentPoint + 1 >= dec_patrolPoints.Count)
                 {
-                    nextPointIndex = currentPoint - 1;
+                    nextPointIndex = _currentPoint - 1;
                     _dec_reversed = true;
                 }
                 else
                 {
-                    if(_dec_reversed && currentPoint - 1 < 0)
+                    if(_dec_reversed && _currentPoint - 1 < 0)
                     {
                         _dec_reversed = !_dec_reversed;
                     }
-                    if(_dec_reversed) nextPointIndex = currentPoint - 1; else nextPointIndex = currentPoint + 1;
+                    if(_dec_reversed) nextPointIndex = _currentPoint - 1; else nextPointIndex = _currentPoint + 1;
                     
                 }
                 break;
             case PatrolPointsState.loop:
-                if (currentPoint + 1 >= dec_patrolPoints.Count)
+                if (_currentPoint + 1 >= dec_patrolPoints.Count)
                 {
                     nextPointIndex = 0;
                 }
                 else
                 {
-                    nextPointIndex = currentPoint + 1;
+                    nextPointIndex = _currentPoint + 1;
                 }
                 break;
             case PatrolPointsState.nothing:
-                if (currentPoint + 1 >= dec_patrolPoints.Count)
+                if (_currentPoint + 1 >= dec_patrolPoints.Count)
                 {
                     _data.SetForceStopMovement(true);
                     _data.refer.PlayAnimation(Enm_References.animations.idle, 0);
                 }
                 else
                 {
-                    nextPointIndex = currentPoint + 1;
+                    nextPointIndex = _currentPoint + 1;
                 }
                 break;
                     default:
@@ -464,47 +470,47 @@ public class Enm_Patrol : MonoBehaviour
         }
         return dec_patrolPoints[nextPointIndex];
     }
-    private int _GetNextPointIndex(int currentPoint)
+    private int _GetNextPointIndex(int _currentPoint)
     {
         int nextPointIndex = 0;
         switch (dec_OnLastPointDo)
         {
             case PatrolPointsState.reverse:
-                if (currentPoint + 1 >= dec_patrolPoints.Count)
+                if (_currentPoint + 1 >= dec_patrolPoints.Count)
                 {
-                    nextPointIndex = currentPoint - 1;
+                    nextPointIndex = _currentPoint - 1;
                     _dec_reversed = true;
                 }
                 else
                 {
-                    if (_dec_reversed && currentPoint - 1 < 0)
+                    if (_dec_reversed && _currentPoint - 1 < 0)
                     {
                         _dec_reversed = !_dec_reversed;
                     }
                     
-                    if (_dec_reversed) nextPointIndex = currentPoint - 1; else nextPointIndex = currentPoint + 1;
+                    if (_dec_reversed) nextPointIndex = _currentPoint - 1; else nextPointIndex = _currentPoint + 1;
                     
                 }
                 break;
             case PatrolPointsState.loop:
-                if (currentPoint + 1 >= dec_patrolPoints.Count)
+                if (_currentPoint + 1 >= dec_patrolPoints.Count)
                 {
                     nextPointIndex = 0;
                 }
                 else
                 {
-                    nextPointIndex = currentPoint + 1;
+                    nextPointIndex = _currentPoint + 1;
                 }
                 break;
             case PatrolPointsState.nothing:
-                if (currentPoint + 1 >= dec_patrolPoints.Count)
+                if (_currentPoint + 1 >= dec_patrolPoints.Count)
                 {
                     _data.SetForceStopMovement(true);
                     _data.refer.PlayAnimation(Enm_References.animations.idle, 0);
                 }
                 else
                 {
-                    nextPointIndex = currentPoint + 1;
+                    nextPointIndex = _currentPoint + 1;
                 }
                 break;
             default:
@@ -536,9 +542,9 @@ public class Enm_Patrol : MonoBehaviour
             }
         } 
     }
-    private string _GetPointName(int currentPoint)
+    private string _GetPointName(int _currentPoint)
     {
-        return (dec_patrolPoints[currentPoint].pointName != string.Empty) ? dec_patrolPoints[currentPoint].pointName : $"Point{currentPoint}";
+        return (dec_patrolPoints[_currentPoint].pointName != string.Empty) ? dec_patrolPoints[_currentPoint].pointName : $"Point{_currentPoint}";
     }
     private void _PatrolDeceleratedPointsEditorUpdateRemoveAndAdd()
     {
@@ -636,11 +642,12 @@ public class Enm_Patrol : MonoBehaviour
         if (dec_patrolPointsHolder == null) return;
         if (dec_patrolPoints.Count < 2) return;
         if (!_dec_activePathVisualizesion) return;
-        
+        //if in hierarchii of patrol points holder will show up gameobject that was not build from points list then destroy it
         foreach (Transform Child in dec_patrolPointsHolder)
         {
             if (!_dec_lastSavedPatrolPointsTransfroms.Contains(Child)) DestroyImmediate(Child.gameObject, true);
         }
+        //draw all points and connections
         for (int i = 0; i < dec_patrolPoints.Count; i++)
         {
             var point = dec_patrolPoints[i];
@@ -654,15 +661,15 @@ public class Enm_Patrol : MonoBehaviour
         }
         
     }
-    public void _OnReachedEnd_Wait(float waitTime)
+    public void _OnReachedEnd_Wait(float _waitTime)
     {
-        StartCoroutine(waitAndIdle(waitTime));
+        StartCoroutine(waitAndIdle(_waitTime));
     }
-    private IEnumerator waitAndIdle(float waitTime)
+    private IEnumerator waitAndIdle(float _waitTime)
     {
         _data.SetForceStopMovement(true,true,false);
         _data.refer.PlayAnimation(Enm_References.animations.idle, 0);
-        yield return new WaitForSeconds(waitTime);
+        yield return new WaitForSeconds(_waitTime);
         _data.SetForceStopMovement(false);
     }
     private void _Draw_ActivePathVisualizesion()

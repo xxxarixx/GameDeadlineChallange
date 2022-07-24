@@ -77,6 +77,7 @@ public class Player_Movement : MonoBehaviour
     }
     private void _GroundedAndCoyoteTime()
     {
+        //coyote jump is a little bit dealy after falling from edge to give player more 'fair' jumps
         var localGrounded = Physics2D.Raycast(refer.flip_Pivolt.position, Vector2.down, grounded_DistancePlayerGround, groundLayerMask);
         if (_coyoteTimeUsed && _coyoteTimeEnded || localGrounded)
         {
@@ -120,6 +121,7 @@ public class Player_Movement : MonoBehaviour
     }
     private void _Jump_Perform()
     {
+        //jump process
         _jumpReachedEnd = false;
         refer.PlayAnimation(Player_References.animations.jump, 0);
         _jumpPressProgress += Time.fixedDeltaTime;
@@ -141,6 +143,9 @@ public class Player_Movement : MonoBehaviour
         _isPerformingJump = false;
         _jumpPressProgress = 0f;
     }
+    /// <summary>
+    /// its centerlizesion of all constantly when nessesery updated jump actions
+    /// </summary>
     private void _Jump_Action()
     {
         if (refer.input.jumpPressed && _isPerformingJump ) _Jump_Perform();
@@ -190,12 +195,6 @@ public class Player_Movement : MonoBehaviour
         if((_axis == _MoveAxis.Verical)) Debug.Log($"invert velocity added:{invertedAxis * refer.rb.velocity} speed Multiplayed: {_speed * Time.fixedDeltaTime}");
         refer.rb.velocity = axis * refer.input.moveInput * _speed * Time.fixedDeltaTime + invertedAxis * refer.rb.velocity;
     }
-    public void MoveIndependentOnPlayerInput(float _speed, Vector2 _direction, bool _beEffectedByMoveState = true)
-    {
-        if (!_canMove && _beEffectedByMoveState) return;
-        Vector2 axisToLeave = new Vector2((_direction.x == 0) ? 1f : 0f, (_direction.y == 0) ? 1f : 0f);
-        refer.rb.velocity = _direction * _speed * Time.fixedDeltaTime + axisToLeave * refer.rb.velocity;
-    }
     private void _FixedUpdate_Debug()
     {
         debug_rbVelocity = refer.rb.velocity;
@@ -208,6 +207,12 @@ public class Player_Movement : MonoBehaviour
     #endregion
 
     #region Public Functions
+    public void MoveIndependentOnPlayerInput(float _speed, Vector2 _direction, bool _beEffectedByMoveState = true)
+    {
+        if (!_canMove && _beEffectedByMoveState) return;
+        Vector2 axisToLeave = new Vector2((_direction.x == 0) ? 1f : 0f, (_direction.y == 0) ? 1f : 0f);
+        refer.rb.velocity = _direction * _speed * Time.fixedDeltaTime + axisToLeave * refer.rb.velocity;
+    }
     public void SetMoveState(bool _canMove)
     {
         if (_canMove && refer.healthSystem.isDead()) return;
@@ -218,9 +223,9 @@ public class Player_Movement : MonoBehaviour
     {
         refer.rb.velocity = Vector2.zero;
     }
-    public void StopPlayerMove(Vector2 offsetVelocity)
+    public void StopPlayerMove(Vector2 _offsetVelocity)
     {
-        refer.rb.velocity = Vector2.zero + offsetVelocity;
+        refer.rb.velocity = Vector2.zero + _offsetVelocity;
     }
     public void StopJump()
     {

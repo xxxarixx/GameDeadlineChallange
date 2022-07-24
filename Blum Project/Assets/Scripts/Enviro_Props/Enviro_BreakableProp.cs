@@ -14,21 +14,23 @@ public class Enviro_BreakableProp : MonoBehaviour,IDamagableByPlayer
     [SerializeField]private float destroyAfterValueSeconds = 0f;
     [Header("FadeOut")]
     [SerializeField] private float fadeOutAnimationAfterValueSeconds = 0f;
+    private float _fadeOutAnimationAfterValueSecondsProcess;
     public float fadeOutSpeed = 10f;
     public List<SpriteRenderer> fadeOutSprites = new List<SpriteRenderer>();
-    private float fadeOutAnimationAfterValueSecondsProcess;
     public float currentHealth { get; private set; }
-    private int hitID;
+    private int _hitID;
     void Start()
     {
         currentHealth = maxHealth;
-        fadeOutAnimationAfterValueSecondsProcess = fadeOutAnimationAfterValueSeconds;
+        _fadeOutAnimationAfterValueSecondsProcess = fadeOutAnimationAfterValueSeconds;
+        //if animation controller runtime was not replaced then automaticlly replace it
         if (anim.runtimeAnimatorController != animations) anim.runtimeAnimatorController = animations;
     }
     void Update()
     {
         if (currentHealth > 0) return;
-        if (fadeOutAnimationAfterValueSecondsProcess > 0f) fadeOutAnimationAfterValueSecondsProcess -= Time.deltaTime;
+        //fade out animation
+        if (_fadeOutAnimationAfterValueSecondsProcess > 0f) _fadeOutAnimationAfterValueSecondsProcess -= Time.deltaTime;
         else
         {
             foreach (var item in fadeOutSprites)
@@ -46,20 +48,21 @@ public class Enviro_BreakableProp : MonoBehaviour,IDamagableByPlayer
     public void OnHit(float _damage, int _hitID, Vector3 _hitInvokerPosition, float _weaponKnockForce)
     {
         //detection one damage per swing
-        if (this.hitID == _hitID) return;
-        this.hitID = _hitID;
+        if (this._hitID == _hitID) return;
+        this._hitID = _hitID;
         Main_GameManager.instance.SpawnDamagePopup(transform.position, _damage);
         currentHealth -= _damage;
         _DeadChecker();
     }
     public void ResetHitID()
     {
-        hitID = -1;
+        _hitID = -1;
     }
     private void _DeadChecker()
     {
         if (currentHealth > 0) return;
         Main_GameManager.instance.DropItem(dropItemID, transform.position + .2f * Vector3.up, dropCount, dropEverythingInXseconds);
+        //use static destroy animation to play and then it will use overrider to correct it
         anim.Play("Enivro_DestroyAnimatorReference_Destroy");
         Destroy(gameObject, destroyAfterValueSeconds);
     }

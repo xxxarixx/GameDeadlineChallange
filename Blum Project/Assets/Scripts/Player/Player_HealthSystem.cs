@@ -15,16 +15,16 @@ public class Player_HealthSystem : MonoBehaviour,IDamagableByEnemy
     public event nothingDele OnInvicibilityEnded;
     public event nothingDele OnInvicibilityStarted;
     public int currentHealth { get; private set; }
-    private List<HealthContainer> healthContainers = new List<HealthContainer>();
+    private List<HealthContainer> _healthContainers = new List<HealthContainer>();
     [System.Serializable]
     public class HealthContainer 
     {
         public Image conatinerImg;
         public bool isEmpty = false;
-        public HealthContainer(Image conatinerImg, bool isEmpty)
+        public HealthContainer(Image _conatinerImg, bool _isEmpty)
         {
-            this.conatinerImg = conatinerImg;
-            this.isEmpty = isEmpty;
+            this.conatinerImg = _conatinerImg;
+            this.isEmpty = _isEmpty;
         }
     }
 
@@ -37,27 +37,6 @@ public class Player_HealthSystem : MonoBehaviour,IDamagableByEnemy
         }
         _AddHeartContainers(maxStartHealth);
     }
-    void OnEnable()
-    {
-        OnInvicibilityStarted += Player_HealthSystem_OnInvicibilityStarted; 
-        OnInvicibilityEnded += Player_HealthSystem_OnInvicibilityEnded;
-    }
-
-    void OnDisable()
-    {
-        OnInvicibilityStarted -= Player_HealthSystem_OnInvicibilityStarted;
-        OnInvicibilityEnded -= Player_HealthSystem_OnInvicibilityEnded;
-    }
-    private void Player_HealthSystem_OnInvicibilityEnded()
-    {
-        refer.mainSprend.color = Color.white;
-    }
-
-    private void Player_HealthSystem_OnInvicibilityStarted()
-    {
-        refer.mainSprend.color = Color.yellow;
-    }
-
     void Update()
     {
         if (isDead()) refer.rb.velocity = Vector2.zero;
@@ -67,51 +46,88 @@ public class Player_HealthSystem : MonoBehaviour,IDamagableByEnemy
             if (invicibilityProcess < 0f) OnInvicibilityEnded?.Invoke();
         }
     }
+    private void OnEnable()
+    {
+        OnInvicibilityStarted += Player_HealthSystem_OnInvicibilityStarted; 
+        OnInvicibilityEnded += Player_HealthSystem_OnInvicibilityEnded;
+    }
+    private void OnDisable()
+    {
+        OnInvicibilityStarted -= Player_HealthSystem_OnInvicibilityStarted;
+        OnInvicibilityEnded -= Player_HealthSystem_OnInvicibilityEnded;
+    }
+    private void Player_HealthSystem_OnInvicibilityEnded()
+    {
+        refer.mainSprend.color = Color.white;
+    }
+    private void Player_HealthSystem_OnInvicibilityStarted()
+    {
+        refer.mainSprend.color = Color.yellow;
+    }
     private bool _CanBeHurted()
     {
         return invicibilityProcess <= 0f;
     }
-    private void _SetInvicibilityTime(float time)
+    private void _SetInvicibilityTime(float _time)
     {
-        if (time > 0f) OnInvicibilityStarted?.Invoke();
-        invicibilityProcess = time;
+        if (_time > 0f) OnInvicibilityStarted?.Invoke();
+        invicibilityProcess = _time;
     }
-    public void _AddHeartContainers(int HeartContainerCount, bool full = true)
+    private void _knockbackPlayer(Vector3 _invokerPosition, float _knockBackMultiplayer)
     {
-        for (int i = 0; i < HeartContainerCount; i++)
+        _SetInvicibilityTime(invicibilityTimeAfterHit);
+        var knockDir = (refer.flip_Pivolt.position - _invokerPosition).normalized;
+        StartCoroutine(_knockBackProcessing(knockDir, _knockBackMultiplayer));
+    }
+    private IEnumerator _knockBackProcessing(Vector3 _knockDirection, float _knockBackMultiplayer)
+    {
+        refer.movement.SetMoveState(false);
+        refer.movement.MoveIndependentOnPlayerInput(defaultPlayerKnockBack * _knockBackMultiplayer, _knockDirection, false);
+        yield return new WaitForSeconds(.2f);
+        refer.movement.SetMoveState(true);
+
+    }
+    private void _UpdateHeartContainer(int _remainingDamageDealt)
+    {
+        for (int i = _healthContainers.Count - 1; i >= 0; i--)
         {
-            if (healthContainers.Count >= maxHealth) return;
-            var spawnedContainer = Instantiate(refer.fullHealthContainerPrefab, Main_UiController.instance.healthContainerHolder.transform);
-            healthContainers.Add(new HealthContainer(spawnedContainer.GetComponent<Image>(), true));
-            _SetContainerState(healthContainers[healthContainers.Count - 1],true);
-            if (full) Heal(1);
+            var heartContainer = _healthContainers[i];
+            if (heartContainer.isEmpty) continue;
+            if (_remainingDamageDealt <= 0f) break;
+            _SetContainerState(heartContainer, true);
+            _remainingDamageDealt--;
+
         }
     }
-    public void _AddHeartContainers(int HeartContainerCount)
+    private void _SetContainerState(HealthContainer _healthContainer,bool _destroyed)
     {
-        for (int i = 0; i < HeartContainerCount; i++)
-        {
-            if (healthContainers.Count >= maxHealth) return;
-            var spawnedContainer = Instantiate(refer.fullHealthContainerPrefab, Main_UiController.instance.healthContainerHolder.transform);
-            healthContainers.Add(new HealthContainer(spawnedContainer.GetComponent<Image>(), true));
-            _SetContainerState(healthContainers[healthContainers.Count - 1], true);
-             Heal(1);
-        }
+        _healthContainer.conatinerImg.sprite = (_destroyed) ?  refer.emptyHealthSprite : refer.fullHealthSprite;
+        _healthContainer.isEmpty = _destroyed;
+    }
+    private void _CheckForPlayerDeath()
+    {
+        if (!isDead()) return;
+        refer.movement.SetMoveState(false);
+        Main_UiController.instance.deadScreen.SetActive(true);
+        refer.rb.velocity = new Vector2(0f, 0f);
+        refer.PlayAnimation(Player_References.animations.idle, 10);
+        refer.rb.gravityScale = 0;
+        refer.collision.enabled = false;
     }
 
-    public void _RemoveHeartContainers(int HeartContainerCount)
+    public void _RemoveHeartContainers(int _heartContainerCount)
     {
-        for (int i = healthContainers.Count - 1; i >= 0; i--)
+        for (int i = _healthContainers.Count - 1; i >= 0; i--)
         {
-            if(healthContainers.Count == 0) return;
-            if (HeartContainerCount <= 0) break;
-            var heartContainer = healthContainers[i];
+            if(_healthContainers.Count == 0) return;
+            if (_heartContainerCount <= 0) break;
+            var heartContainer = _healthContainers[i];
             Destroy(heartContainer.conatinerImg.gameObject);
-            if (!healthContainers[i].isEmpty) currentHealth--;
-            HeartContainerCount--;
-            healthContainers.RemoveAt(i);
+            if (!_healthContainers[i].isEmpty) currentHealth--;
+            _heartContainerCount--;
+            _healthContainers.RemoveAt(i);
         }
-        if (healthContainers.Count == 0) _CheckForPlayerDeath();
+        if (_healthContainers.Count == 0) _CheckForPlayerDeath();
     }
     public void OnHit(int _damage,Vector3 _invokerPosition, float _knockbackMultiplayer)
     {
@@ -125,55 +141,41 @@ public class Player_HealthSystem : MonoBehaviour,IDamagableByEnemy
     {
         OnHit(_damage, refer.flip_Pivolt.position, 1f);
     }
-    private void _knockbackPlayer(Vector3 _invokerPosition, float _knockBackMultiplayer)
+    public void Heal(int _heartsCount)
     {
-        _SetInvicibilityTime(invicibilityTimeAfterHit);
-        var knockDir = (refer.flip_Pivolt.position - _invokerPosition).normalized;
-        StartCoroutine(_knockBackProcessing(knockDir, _knockBackMultiplayer));
-    }
-    private IEnumerator _knockBackProcessing(Vector3 knockDirection, float _knockBackMultiplayer)
-    {
-        refer.movement.SetMoveState(false);
-        refer.movement.MoveIndependentOnPlayerInput(defaultPlayerKnockBack * _knockBackMultiplayer, knockDirection, false);
-        yield return new WaitForSeconds(.2f);
-        refer.movement.SetMoveState(true);
-
-    }
-    public void Heal(int HeartsCount)
-    {
-        for (int i = currentHealth; i < currentHealth + HeartsCount; i++)
+        for (int i = currentHealth; i < currentHealth + _heartsCount; i++)
         {
-            if (i > healthContainers.Count - 1) return;
-            _SetContainerState(healthContainers[i], false);
+            if (i > _healthContainers.Count - 1) return;
+            _SetContainerState(_healthContainers[i], false);
         }
-        currentHealth += HeartsCount;
+        currentHealth += _heartsCount;
     }
-    private void _UpdateHeartContainer(int remainingDamageDealt)
+    public void _AddHeartContainers(int _heartContainerCount, bool _full = true)
     {
-        for (int i = healthContainers.Count - 1; i >= 0; i--)
+        for (int i = 0; i < _heartContainerCount; i++)
         {
-            var heartContainer = healthContainers[i];
-            if (heartContainer.isEmpty) continue;
-            if (remainingDamageDealt <= 0f) break;
-            _SetContainerState(heartContainer, true);
-            remainingDamageDealt--;
-
+            //if there is too much containers then just ignore
+            if (_healthContainers.Count >= maxHealth) return;
+            var spawnedContainer = Instantiate(refer.fullHealthContainerPrefab, Main_UiController.instance.healthContainerHolder.transform);
+            _healthContainers.Add(new HealthContainer(spawnedContainer.GetComponent<Image>(), true));
+            //add empty container
+            _SetContainerState(_healthContainers[_healthContainers.Count - 1],true);
+            if (_full) Heal(1);
         }
     }
-    private void _SetContainerState(HealthContainer healthContainer,bool Destroyed)
+    //this version of add heart containers mainly used for build in unity event (f.ex button)
+    public void _AddHeartContainers(int _heartContainerCount)
     {
-        healthContainer.conatinerImg.sprite = (Destroyed) ?  refer.emptyHealthSprite : refer.fullHealthSprite;
-        healthContainer.isEmpty = Destroyed;
-    }
-    private void _CheckForPlayerDeath()
-    {
-        if (!isDead()) return;
-        refer.movement.SetMoveState(false);
-        Main_UiController.instance.deadScreen.SetActive(true);
-        refer.rb.velocity = new Vector2(0f, 0f);
-        refer.PlayAnimation(Player_References.animations.idle, 10);
-        refer.rb.gravityScale = 0;
-        refer.collision.enabled = false;
+        for (int i = 0; i < _heartContainerCount; i++)
+        {
+            //if there is too much containers then just ignore
+            if (_healthContainers.Count >= maxHealth) return;
+            var spawnedContainer = Instantiate(refer.fullHealthContainerPrefab, Main_UiController.instance.healthContainerHolder.transform);
+            _healthContainers.Add(new HealthContainer(spawnedContainer.GetComponent<Image>(), true));
+            //add empty container
+            _SetContainerState(_healthContainers[_healthContainers.Count - 1], true);
+             Heal(1);
+        }
     }
     public bool isDead()
     {

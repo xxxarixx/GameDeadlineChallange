@@ -1,7 +1,9 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
+/// <summary>
+/// it is centerlizesion of all enemy references and animations in one easy accesable place
+/// </summary>
 public class Enm_References : MonoBehaviour
 {
     [Header("Components")]
@@ -52,14 +54,14 @@ public class Enm_References : MonoBehaviour
         anim.Play(animationToPlay);
 
     }
-    public void PlayAnimation(animations _animationEnum, int _priority, out bool canPlayThis)
+    public void PlayAnimation(animations _animationEnum, int _priority, out bool _animationCanBePLayer)
     {
-        canPlayThis = false;
+        _animationCanBePLayer = false;
         if (_currentAnimationPriority > _priority) return;
         _currentAnimationPriority = _priority;
         var animationToPlay = _animations_EnumToAnimation(_animationEnum);
         _curPlayingAnimation = _animationEnum;
-        canPlayThis = true;
+        _animationCanBePLayer = true;
         anim.Play(animationToPlay);
 
     }

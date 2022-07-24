@@ -1,7 +1,9 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
+/// <summary>
+/// every enemy controller script should have reference to it because it contain all practical enemy stuff and is every enemy center
+/// </summary>
 public class Enm_Behaviour : MonoBehaviour
 {
     public Enm_References refer;
@@ -56,6 +58,12 @@ public class Enm_Behaviour : MonoBehaviour
         Vector2 invertedAxis = (_axis == _MoveAxis.Horizontal) ? new Vector2(0, 1) : new Vector2(1, 0);
         refer.rb.velocity = axis * new Vector2(_moveDirX, 1f) * _speed * Time.fixedDeltaTime + invertedAxis * refer.rb.velocity;
     }
+    public void MoveIndependentOnMoveDirection(float _speed, Vector2 _direction, bool _canBeEffectedByStopMovement = true)
+    {
+        if (_stopMove && _canBeEffectedByStopMovement) return;
+        Vector2 axisToLeave = new Vector2((_direction.x == 0) ? 1f : 0f, (_direction.y == 0) ? 1f : 0f);
+        refer.rb.velocity = _direction * _speed * Time.fixedDeltaTime + axisToLeave * refer.rb.velocity;
+    }
     private void _SpeedSetup()
     {
         _speedGrounded = maxGroundSpeed + Random.Range(-currentSpeed / 10, currentSpeed / 10);
@@ -103,6 +111,7 @@ public class Enm_Behaviour : MonoBehaviour
     }
     public void _Flip()
     {
+        //facing is based on flipping X local scale 
         _moveDirX = -_moveDirX;
         refer.flip_Pivolt.localScale = new Vector3(-refer.flip_Pivolt.localScale.x, refer.flip_Pivolt.localScale.y, refer.flip_Pivolt.localScale.z);
     }

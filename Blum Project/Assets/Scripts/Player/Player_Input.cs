@@ -2,6 +2,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
+/// <summary>
+/// quick setuped input easy and ready to use in code using Unity Input System
+/// </summary>
 public class Player_Input : MonoBehaviour
 {
     private Player_InputSystem _inputSystem;
