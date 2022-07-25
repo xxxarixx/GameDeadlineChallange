@@ -771,7 +771,7 @@ GameObject:
   m_Component:
   - component: {fileID: 165086383}
   m_Layer: 0
-  m_Name: Point2
+  m_Name: WaitPoint
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -35456,7 +35456,7 @@ MonoBehaviour:
       m_PersistentCalls:
         m_Calls: []
     manualJumpForce: 0
-  - pointName: 
+  - pointName: WaitPoint
     pointTransform: {fileID: 165086383}
     onReachedPatrolPoint:
       m_PersistentCalls:
