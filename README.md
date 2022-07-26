@@ -4,9 +4,8 @@
 <p>A lot of features as damage popup animations or jump velocity is strongly and easy customized in inspector mostly by animation curves.</p>
 <p>Key scripts are using custom inspector to as previously said stay in clean editor.</p>
 <p>Mostly of raycasts are scalled with length and snapped of given pivolt so its very hard to messed up something in enemy settings.</p>
-<p>Simmilar is with patrol decleareted points in hierarchii,points can be added only by list if you try to remove/add in hierarchii something it will automaticlly after</p>
-<p>pressed on object holding script repainted.</p>
-<p>Enemies that patroll and have knockback multiplayer heigher then 0 will be knock out of his patrol points he will check if he is able to come back if not then he changing his enemy type to from edge to edge.</p>
+<p>Simmilar is with patrol decleareted points in hierarchii,points can be added only by list if you try to remove/add in hierarchii something it will automaticlly after pressed on object holding script repainted.</p>
+<p>Enemies that patroll and have knockback multiplayer heigher then 0 and were knocked out of his patrol points he will check if he is able to come back if not then he change his enemy type to from edge to edge.</p>
 <p>Nearly every script in my opinion is property documented dependly of complexity of particilar system/function.</p>
 <p>PS: everything that could be founded here is made from zero and made by myself.</p>
 <p>Also can be found:</p>
