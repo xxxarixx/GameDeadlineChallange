@@ -1,4 +1,4 @@
-<h3>Features added to project:</h3>
+<h3>Features added to project: (in 1 week range)</h3>
 
 <p>Main feature of this project is definitly care of clean editor and making it as most functional/scalable as possible.</p>
 <p>A lot of features as damage popup animations or jump velocity is strongly and easy customized in inspector mostly by animation curves.</p>
@@ -20,7 +20,7 @@
 <li>player health health system with ability to add/remove run time heart containers.</li>
 </ul>
 <p>enemies:</p>
-<li>goblin chase when see player and nothing is bloking his path to player nad when player come too close then he will try to hit player with sword</li>
+<li>goblin chase when see player and nothing is bloking his path to player and when player come too close then he will try to hit player with sword</li>
 <li>custom patrol points</li>
 <li>edge to edge patrol</li>
 </p>
